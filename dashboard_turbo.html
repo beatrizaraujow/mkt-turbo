@@ -136,31 +136,31 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 
 /* ── COINS TOTAL ── */
 .coins-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
-.coins-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px}
-.coin-tile{background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.1);border-radius:12px;padding:12px;text-align:center;transition:border-color .3s}
-.coin-tile.top{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.1);box-shadow:0 0 20px rgba(255,215,0,.08)}
-.ct-name{font-size:12px;font-weight:700;margin-bottom:6px}
-.ct-stars{font-size:15px;min-height:20px;letter-spacing:1px}
-.ct-total{font-size:20px;font-weight:900;color:var(--gold);line-height:1}
-.ct-plus{font-size:12px;color:rgba(255,215,0,.5)}
+.coins-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(162px,1fr));gap:12px}
+.coin-tile{background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.1);border-radius:14px;padding:15px 13px;text-align:center;transition:border-color .3s}
+.coin-tile.top{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.1);box-shadow:0 0 24px rgba(255,215,0,.1)}
+.ct-name{font-size:13px;font-weight:800;margin-bottom:7px;letter-spacing:.2px}
+.ct-stars{font-size:16px;min-height:22px;letter-spacing:2px}
+.ct-total{font-size:26px;font-weight:900;color:var(--gold);line-height:1;margin-top:2px}
+.ct-plus{font-size:13px;color:rgba(255,215,0,.5)}
 .ct-sub{font-size:9px;color:var(--muted);margin-top:3px;margin-bottom:6px}
-.ct-stat{display:flex;justify-content:space-between;align-items:center;margin-top:4px;gap:4px}
+.ct-stat{display:flex;justify-content:space-between;align-items:center;margin-top:5px;gap:4px}
 .ct-sl{font-size:10px;color:var(--muted);white-space:nowrap}
 .ct-sr{font-size:10px;color:var(--muted);white-space:nowrap}
-.ct-jun{display:flex;justify-content:space-between;align-items:center;margin-top:7px;padding-top:6px;border-top:1px solid rgba(255,215,0,.12)}
-.ct-jun-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.ct-jun-val{font-size:15px;font-weight:900;color:var(--gold)}
-.ct-wk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(26px,1fr));gap:3px;margin-top:5px}
-.ct-wk{text-align:center;padding:4px 2px;border-radius:5px;background:rgba(255,255,255,.04)}
-.ct-wk.hit{background:rgba(255,215,0,.15)}
-.ct-wk-lbl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
-.ct-wk-val{font-size:11px;font-weight:700;color:var(--muted)}
+.ct-jun{display:flex;justify-content:space-between;align-items:center;margin-top:9px;padding-top:7px;border-top:1px solid rgba(255,215,0,.14)}
+.ct-jun-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.ct-jun-val{font-size:18px;font-weight:900;color:var(--gold)}
+.ct-wk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(30px,1fr));gap:4px;margin-top:6px}
+.ct-wk{text-align:center;padding:5px 3px;border-radius:6px;background:rgba(255,255,255,.04)}
+.ct-wk.hit{background:rgba(255,215,0,.16)}
+.ct-wk-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.ct-wk-val{font-size:12px;font-weight:700;color:var(--muted)}
 .ct-wk.hit .ct-wk-val{color:var(--gold)}
-.ct-hoje-tag{font-size:8px;color:rgba(255,215,0,.35);text-transform:uppercase;letter-spacing:.5px;margin-top:6px;margin-bottom:2px}
-.ct-wk-today-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(26px,1fr));gap:3px}
+.ct-hoje-tag{font-size:8px;color:rgba(255,215,0,.38);text-transform:uppercase;letter-spacing:.6px;margin-top:7px;margin-bottom:3px}
+.ct-wk-today-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(30px,1fr));gap:4px}
 .ct-wk.hoje{background:rgba(255,215,0,.06);border:1px dashed rgba(255,215,0,.28)}
-.ct-wk.hoje.hit{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.4)}
-.ct-stars-extra{font-size:11px;font-weight:800;color:var(--gold);vertical-align:2px;margin-left:2px}
+.ct-wk.hoje.hit{background:rgba(255,215,0,.11);border-color:rgba(255,215,0,.42)}
+.ct-stars-extra{font-size:12px;font-weight:800;color:var(--gold);vertical-align:2px;margin-left:2px}
 
 /* ── PRE-EVENT ── */
 .pre-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:300}
@@ -238,12 +238,12 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
   <div class="comp-grid">
     <div class="comp-card">
       <div class="comp-h">⚡ Produtividade do Dia <span class="comp-rule">🥇+3 · 🥈+2 · 🥉+1 coin</span></div>
-      <div class="comp-sub">Coef. = horas + tasks + rotina/UGC + % meta diária · coins só para top 3 com coef ≥ 100%</div>
+      <div class="comp-sub">Ranking por produtividade do dia (30/jun) · top 3 ganham coins por posição, sem restrição de coef</div>
       <div id="rank-prod"></div>
     </div>
     <div class="comp-card">
-      <div class="comp-h">📅 Meta Semanal <span class="comp-rule">coins normais</span></div>
-      <div class="comp-sub">Quem bater a meta semanal ganha os coins padrão</div>
+      <div class="comp-h">📅 Meta Semanal <span class="comp-rule">3c ≥100% · 5c ≥120%</span></div>
+      <div class="comp-sub">Semana atual (29/jun+) · meta 100% = 3 coins · meta 120% = 5 coins</div>
       <div id="rank-sem"></div>
     </div>
     <div class="comp-card">
@@ -763,12 +763,12 @@ function renderProd() {
   document.getElementById('rank-prod').innerHTML = ranked.map((r,i)=>{
     const w = (r.pct/Math.max(maxV,1))*100;
     const cn = coins[i]??0;
-    const earns = r.pct>=100&&cn>0;
+    const earns = cn>0;
     return `<div class="rk-row">
       <div class="rk-pos">${['🥇','🥈','🥉'][i]||i+1}</div>
       <div class="rk-name">${r.nome}</div>
       <div class="rk-track"><div class="rk-fill ${fills[i]}" style="width:${Math.max(w,5)}%">${r.pct.toFixed(1)}%</div></div>
-      <div class="rk-coin ${earns?'':'dim'}">${earns?'+'+cn+'🪙':cn>0?'🔒'+cn:''}</div>
+      <div class="rk-coin ${earns?'':'dim'}">${earns?'+'+cn+'🪙':''}</div>
     </div>`;
   }).join('');
 }
