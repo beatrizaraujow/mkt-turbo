@@ -150,16 +150,17 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .ct-jun{display:flex;justify-content:space-between;align-items:center;margin-top:7px;padding-top:6px;border-top:1px solid rgba(255,215,0,.12)}
 .ct-jun-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 .ct-jun-val{font-size:15px;font-weight:900;color:var(--gold)}
-.ct-wk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-top:5px}
+.ct-wk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(26px,1fr));gap:3px;margin-top:5px}
 .ct-wk{text-align:center;padding:4px 2px;border-radius:5px;background:rgba(255,255,255,.04)}
 .ct-wk.hit{background:rgba(255,215,0,.15)}
 .ct-wk-lbl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
 .ct-wk-val{font-size:11px;font-weight:700;color:var(--muted)}
 .ct-wk.hit .ct-wk-val{color:var(--gold)}
-.ct-rank{margin-top:6px;padding:4px 8px;border-radius:7px;font-size:10px;font-weight:700;text-align:center}
-.ct-rank.hit{background:rgba(255,215,0,.18);color:var(--gold)}
-.ct-rank.lock{background:rgba(239,68,68,.1);color:#f87171}
-.ct-rank.dim{background:rgba(255,255,255,.04);color:var(--muted);font-weight:500}
+.ct-hoje-tag{font-size:8px;color:rgba(255,215,0,.35);text-transform:uppercase;letter-spacing:.5px;margin-top:6px;margin-bottom:2px}
+.ct-wk-today-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(26px,1fr));gap:3px}
+.ct-wk.hoje{background:rgba(255,215,0,.06);border:1px dashed rgba(255,215,0,.28)}
+.ct-wk.hoje.hit{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.4)}
+.ct-stars-extra{font-size:11px;font-weight:800;color:var(--gold);vertical-align:2px;margin-left:2px}
 
 /* ── PRE-EVENT ── */
 .pre-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:300}
@@ -402,7 +403,11 @@ TEAM.forEach(m => { mesData[m.key] = { tasksDone:0, pts:0 }; });
 const apiGet = p => fetch(API_BASE+p, { headers:HDR }).then(r=>r.json());
 const pad    = v => String(v).padStart(2,'0');
 const clamp  = (v,mx=100) => Math.min(mx, Math.max(0, v));
-const stars  = n => '⭐'.repeat(Math.max(0,n));
+const stars  = n => {
+  if(n<=0) return '';
+  if(n<=6) return '⭐'.repeat(n);
+  return '⭐'.repeat(5)+'<span class="ct-stars-extra">+'+( n-5)+'</span>';
+};
 
 const STATUS_EX = ['pendente','em andamento','em progresso','in progress','alteraç','alterac','revisão','revisao','aberto','open','to do','todo'];
 function isComplete(t) {
@@ -874,37 +879,40 @@ function renderCoins() {
         <div class="ct-stat"><span class="ct-sl">hoje: ${tHoje}</span><span class="ct-sr">jun: ${tMes}</span></div>`;
     }
 
-    // semanas de junho (MKT Hub) + potencial turbo hoje
+    // tiles de potencial de hoje (grid separado do histórico)
+    const todayPot = semC+mesB+rankC;
+    const medal    = medals[ri]||'';
+    const todayTiles = [
+      semC>0  ? `<div class="ct-wk hoje hit"><div class="ct-wk-lbl">sem</div><div class="ct-wk-val">${semC}c</div></div>`    : '',
+      mesB>0  ? `<div class="ct-wk hoje hit"><div class="ct-wk-lbl">mês</div><div class="ct-wk-val">${mesB}c</div></div>`    : '',
+      rankC>0 ? `<div class="ct-wk hoje hit"><div class="ct-wk-lbl">${medal}</div><div class="ct-wk-val">${rankC}c</div></div>` : '',
+    ].join('');
+
+    // semanas históricas confirmadas + potencial hoje em grids separados
     let junHtml='';
     if(jun!==undefined){
       const wkCoins = jun?.weeklyCoinsJunRecalc ?? jun?.weeklyCoinsJun ?? 0;
-      // total junho = semanas passadas (sem coef) + potencial deste evento
-      const junTotal = wkCoins + semC + mesB + rankC;
-      const wkGrid = (jun?.weeks||[]).map((w,i)=>{
+      const wkGrid  = (jun?.weeks||[]).map((w,i)=>{
         const val = w.coinsRecalc ?? w.coinsEarned;
         return `<div class="ct-wk ${val>0?'hit':''}">
           <div class="ct-wk-lbl">S${i+1}</div>
           <div class="ct-wk-val">${val>0?val+'c':'—'}</div>
         </div>`;
       }).join('');
-      const medal = medals[ri]||'';
-      const rankTag = rankC>0?`<span class="ct-rank-tag">${medal}+${rankC}</span>`:'';
       junHtml=`<div class="ct-jun">
-        <span class="ct-jun-lbl">Jun 🪙 total</span>
-        <span class="ct-jun-val">${junTotal}</span>
+        <span class="ct-jun-lbl">Jun 🪙 conf</span>
+        <span class="ct-jun-val">${wkCoins}${todayPot>0?`<span style="font-size:10px;color:rgba(255,215,0,.4)"> +${todayPot}?</span>`:''}</span>
       </div>
-      <div class="ct-wk-grid">${wkGrid}
-        ${semC>0?`<div class="ct-wk hit"><div class="ct-wk-lbl">sem</div><div class="ct-wk-val">${semC}c</div></div>`:''}
-        ${mesB>0?`<div class="ct-wk hit"><div class="ct-wk-lbl">mês</div><div class="ct-wk-val">${mesB}c</div></div>`:''}
-        ${rankC>0?`<div class="ct-wk hit"><div class="ct-wk-lbl">${medal}</div><div class="ct-wk-val">${rankC}c</div></div>`:''}
-      </div>`;
+      ${wkGrid?`<div class="ct-wk-grid">${wkGrid}</div>`:''}
+      ${todayTiles?`<div class="ct-hoje-tag">hoje</div><div class="ct-wk-today-row">${todayTiles}</div>`:''}`;
+    } else if(todayTiles){
+      junHtml=`<div class="ct-hoje-tag">hoje potencial</div><div class="ct-wk-today-row">${todayTiles}</div>`;
     }
 
     return `<div class="coin-tile ${isTop?'top':''}">
       <div class="ct-name">${m.nome}</div>
       <div class="ct-stars">${stars(base)}</div>
-      <div class="ct-total">${base}<span class="ct-plus"> +${semC+mesB+rankC}?</span></div>
-      <div class="ct-sub">conf: ${base} · pot: +${semC+mesB+rankC}</div>
+      <div class="ct-total">${base}${todayPot>0?`<span class="ct-plus"> +${todayPot}?</span>`:''}</div>
       ${statsHtml}
       ${junHtml}
     </div>`;
