@@ -299,24 +299,57 @@ const SEM_ATUAL_BASE = {
 };
 
 // SB Coins confirmados ANTES deste evento
+// Histórico validado sem coeficiente — Semanas 1 a 3 de junho
+// weekStart = segunda-feira de cada semana (ISO)
+const HISTORY = {
+  samuel:  [
+    { sem:1, weekStart:'2026-06-01', pct:125, coins:4 },
+    { sem:2, weekStart:'2026-06-08', pct:158, coins:4 },
+    { sem:3, weekStart:'2026-06-15', pct:57,  coins:0 },
+  ],
+  thiago:  [
+    { sem:1, weekStart:'2026-06-01', pct:55,  coins:0 },
+    { sem:2, weekStart:'2026-06-08', pct:65,  coins:1 },
+    { sem:3, weekStart:'2026-06-15', pct:20,  coins:0 },
+  ],
+  klenio:  [
+    { sem:1, weekStart:'2026-06-01', pct:90,  coins:2 },
+    { sem:2, weekStart:'2026-06-08', pct:50,  coins:0 },
+    { sem:3, weekStart:'2026-06-15', pct:20,  coins:0 },
+  ],
+  bia:     [
+    { sem:1, weekStart:'2026-06-01', pct:152, coins:4 },
+    { sem:2, weekStart:'2026-06-08', pct:148, coins:4 },
+    { sem:3, weekStart:'2026-06-15', pct:108, coins:3 },
+  ],
+  malu:    [
+    { sem:1, weekStart:'2026-06-01', rotinaPct:0,   coins:0 },
+    { sem:2, weekStart:'2026-06-08', rotinaPct:69,  coins:1 },
+    { sem:3, weekStart:'2026-06-15', rotinaPct:100, coins:3 },
+  ],
+  zion:    [
+    { sem:1, weekStart:'2026-06-01', ugcPct:10, coins:0 },
+    { sem:2, weekStart:'2026-06-08', ugcPct:36, coins:0 },
+    { sem:3, weekStart:'2026-06-15', ugcPct:91, coins:2 },
+  ],
+  gustavo: [
+    { sem:1, weekStart:'2026-06-01', rotinaPct:0,  coins:0 },
+    { sem:2, weekStart:'2026-06-08', rotinaPct:7,  coins:0 },
+    { sem:3, weekStart:'2026-06-15', rotinaPct:79, coins:1 },
+  ],
+};
+
+// Totais confirmados (soma do HISTORY acima) — fonte de verdade para o painel
 const COINS_ANTERIORES = {
-  samuel:0, thiago:0, klenio:0, bia:0, malu:0, zion:0, gustavo:0,
+  samuel:8, thiago:1, klenio:2, bia:11, malu:4, zion:2, gustavo:1,
 };
 
 // Rotina % por pessoa — preenchido via MKT Hub (loadRotinaFromMktHub)
 const ROTINA_DATA = {}; // key -> { today:{done,total,pct}, month:{done,total,pct} }
 // Tasks mensais ClickUp — preenchido via fetchMonthData
 const mesData = {};
-// Coins de junho por pessoa — preenchido via loadJunhoBreakdown
-const JUNHO_DATA = {}; // key -> { ledgerTotal, weeklyCoinsJun, weeks }
-
-// Histórico de semanas anteriores do mês (para referência interna)
-// Pontos:  { sem:1, pct:103, pts:135, coins:3 }
-// Rotina:  { sem:1, rotinaPct:100, extraPts:0, coins:3 }
-// UGC:     { sem:1, ugcPct:60, postPct:70, extraPts:71, coins:2 }
-const HISTORY = {
-  samuel:[], thiago:[], klenio:[], bia:[], malu:[], zion:[], gustavo:[], // ← PREENCHER
-};
+// Coins de junho por pessoa — pré-populado via seedJunhoFromHistory, complementado via loadJunhoBreakdown
+const JUNHO_DATA = {};
 
 // ═══════════════════════════════════════════════════════════════════
 // FIXOS — não alterar
@@ -936,6 +969,30 @@ async function fetchMonthData() {
   await Promise.all(TEAM.map(m => fetchMonthForMember(m)));
   renderCoins();
 }
+// Pré-popula JUNHO_DATA com os dados validados do HISTORY (semanas 1-3)
+function seedJunhoFromHistory() {
+  const histWeekStarts = new Set(
+    Object.values(HISTORY).flatMap(h => h.map(w => w.weekStart))
+  );
+  TEAM.forEach(m => {
+    const hist = HISTORY[m.key] || [];
+    if (!hist.length) return;
+    const total = hist.reduce((s, w) => s + (w.coins || 0), 0);
+    JUNHO_DATA[m.key] = {
+      ledgerTotal:          COINS_ANTERIORES[m.key],
+      weeklyCoinsJun:       total,
+      weeklyCoinsJunRecalc: total,
+      weeks: hist.map(w => ({
+        weekStart:   w.weekStart,
+        coinsEarned: w.coins,
+        coinsRecalc: w.coins,
+        ptsEarned:   0,
+      })),
+    };
+  });
+  return histWeekStarts;
+}
+
 function recalcJunhoSemCoef() {
   // Coleta todas as semanas presentes em qualquer membro
   const weeksSet = new Set();
@@ -980,30 +1037,50 @@ function recalcJunhoSemCoef() {
 
 async function loadJunhoBreakdown() {
   try {
+    const histWeekStarts = new Set(
+      Object.values(HISTORY).flatMap(h => h.map(w => w.weekStart))
+    );
     const r = await fetch(`${MKTHUB_API}/api/coins?action=team-junho-breakdown&key=${MKTHUB_KEY}`);
     if (!r.ok) return;
     const data = await r.json();
+    // Só adiciona semanas que não estão no HISTORY (ex: Sem 4)
     (data.users || []).forEach(u => {
       const m = _matchTeam(u.email);
-      if (m) JUNHO_DATA[m.key] = {
-        ledgerTotal:    u.ledgerTotal,
-        weeklyCoinsJun: u.weeklyCoinsJun,
-        weeks:          u.weeks || [],
-      };
+      if (!m) return;
+      const newWeeks = (u.weeks || []).filter(w => !histWeekStarts.has(w.weekStart));
+      if (!newWeeks.length) return;
+      const jun = JUNHO_DATA[m.key];
+      if (jun) {
+        jun.weeks.push(...newWeeks);
+        jun.weeks.sort((a, b) => a.weekStart.localeCompare(b.weekStart));
+      } else {
+        JUNHO_DATA[m.key] = { ledgerTotal: u.ledgerTotal, weeklyCoinsJun: 0, weeklyCoinsJunRecalc: 0, weeks: newWeeks };
+      }
     });
     recalcJunhoSemCoef();
-    console.log('[MKT Hub] Junho (recalc sem coef):', JSON.stringify(JUNHO_DATA));
+    // Recalc pode sobrescrever semanas do HISTORY — restaura valores validados
+    TEAM.forEach(m => {
+      const jun = JUNHO_DATA[m.key];
+      if (!jun) return;
+      (HISTORY[m.key] || []).forEach(hw => {
+        const w = jun.weeks.find(w => w.weekStart === hw.weekStart);
+        if (w) { w.coinsEarned = hw.coins; w.coinsRecalc = hw.coins; }
+      });
+      jun.weeklyCoinsJunRecalc = jun.weeks.reduce((s, w) => s + (w.coinsRecalc ?? w.coinsEarned), 0);
+    });
+    console.log('[MKT Hub] Junho mesclado com HISTORY:', JSON.stringify(JUNHO_DATA));
     renderCoins();
   } catch(e) { console.warn('[MKT Hub] loadJunho falhou:', e); }
 }
 
 // ── MAIN ─────────────────────────────────────────────────────────────
 async function startDashboard() {
+  seedJunhoFromHistory(); // pré-popula JUNHO_DATA com valores validados antes de qualquer render
   renderInit(); startClock();
-  await Promise.all([resolveMembers(), resolveField(), loadCoinsFromMktHub(), loadRotinaFromMktHub()]);
+  await Promise.all([resolveMembers(), resolveField(), loadRotinaFromMktHub()]);
   await doPoll();
-  fetchMonthData();   // async — re-renderiza coins ao completar
-  loadJunhoBreakdown(); // async — re-renderiza coins ao completar
+  fetchMonthData();    // async — re-renderiza coins ao completar
+  loadJunhoBreakdown(); // async — adiciona semanas não cobertas pelo HISTORY (ex: Sem 4)
   pollInterval = setInterval(doPoll,60000);
 }
 
