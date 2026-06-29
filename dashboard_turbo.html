@@ -849,16 +849,11 @@ function renderCoins() {
       ${jun.weeks.length?`<div class="ct-wk-grid">${wkGrid}</div>`:''}`;
     }
 
-    // rank do dia turbo
+    // rank do dia turbo — só mostra se ganhou coin
     const medal = medals[ri]||'';
-    let rankHtml='';
-    if(pctR>=100 && rankC>0){
-      rankHtml=`<div class="ct-rank hit">${medal} +${rankC}c turbo</div>`;
-    } else if(ri<3 && rankC===0){
-      rankHtml=`<div class="ct-rank lock">🔒 ${medal} coef &lt; 100%</div>`;
-    } else {
-      rankHtml=`<div class="ct-rank dim">${ri+1}º — sem rank coin</div>`;
-    }
+    const rankHtml = (pctR>=100 && rankC>0)
+      ? `<div class="ct-rank hit">${medal} +${rankC}c turbo</div>`
+      : '';
 
     return `<div class="coin-tile ${isTop?'top':''}">
       <div class="ct-name">${m.nome}</div>
