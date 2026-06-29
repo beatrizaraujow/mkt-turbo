@@ -808,19 +808,23 @@ function renderCoins() {
   const ranked=TEAM.map(m=>({key:m.key,pct:calcProdDia(m.key)})).sort((a,b)=>b.pct-a.pct);
   const medals=['🥇','🥈','🥉'];
   document.getElementById('coins-row').innerHTML = TEAM.map(m=>{
-    const ri=ranked.findIndex(r=>r.key===m.key);
-    const pctR=ranked[ri].pct;
-    const base = COINS_ANTERIORES[m.key]||0;
-    const semC = calcSemCoins(m.key)||0;
-    const mesB = (calcMesPct(m.key)?.pct||0)>=100?3:0;
-    const rankC= pctR>=100 ? (ri===0?3:ri===1?2:ri===2?1:0) : 0;
-    const pot  = base+semC+mesB+rankC;
-    const isTop= pot===Math.max(...TEAM.map(m2=>{ const ri2=ranked.findIndex(r=>r.key===m2.key); const p2=ranked[ri2].pct; const rc2=p2>=100?(ri2===0?3:ri2===1?2:ri2===2?1:0):0; return (COINS_ANTERIORES[m2.key]||0)+(calcSemCoins(m2.key)||0)+((calcMesPct(m2.key)?.pct||0)>=100?3:0)+rc2; }));
+    const ri    = ranked.findIndex(r=>r.key===m.key);
+    const pctR  = ranked[ri].pct;
+    // rank sem restrição de coef — o evento Turbo conta por posição
+    const rankC = ri===0?3:ri===1?2:ri===2?1:0;
+    const base  = COINS_ANTERIORES[m.key]||0;    // confirmado no ledger (MKT Hub)
+    const semC  = calcSemCoins(m.key)||0;
+    const mesB  = (calcMesPct(m.key)?.pct||0)>=100?3:0;
+    const pot   = base+semC+mesB+rankC;
+    const isTop = pot===Math.max(...TEAM.map(m2=>{
+      const ri2=ranked.findIndex(r=>r.key===m2.key);
+      return (COINS_ANTERIORES[m2.key]||0)+(calcSemCoins(m2.key)||0)+((calcMesPct(m2.key)?.pct||0)>=100?3:0)+(ri2===0?3:ri2===1?2:ri2===2?1:0);
+    }));
 
     const isPts = m.grupo==='pontos';
-    const md  = mesData[m.key]||{tasksDone:0,pts:0};
-    const rot = ROTINA_DATA[m.key];
-    const jun = JUNHO_DATA[m.key];
+    const md    = mesData[m.key]||{tasksDone:0,pts:0};
+    const rot   = ROTINA_DATA[m.key];
+    const jun   = JUNHO_DATA[m.key]; // coins das semanas de junho (MKT Hub)
 
     // tasks / rotina
     let statsHtml='';
@@ -834,35 +838,37 @@ function renderCoins() {
         <div class="ct-stat"><span class="ct-sl">hoje: ${tHoje}</span><span class="ct-sr">jun: ${tMes}</span></div>`;
     }
 
-    // semanas de junho — grid S1 S2 S3 S4
+    // semanas de junho (MKT Hub) + potencial turbo hoje
     let junHtml='';
-    if(jun){
-      const wkGrid = jun.weeks.map((w,i)=>
+    if(jun!==undefined){
+      const wkCoins = jun?.weeklyCoinsJun||0;
+      // total junho = semanas passadas + potencial deste evento
+      const junTotal = wkCoins + semC + mesB + rankC;
+      const wkGrid = (jun?.weeks||[]).map((w,i)=>
         `<div class="ct-wk ${w.coinsEarned>0?'hit':'miss'}">
           <div class="ct-wk-lbl">S${i+1}</div>
           <div class="ct-wk-val">${w.coinsEarned>0?w.coinsEarned+'c':'—'}</div>
         </div>`).join('');
+      const medal = medals[ri]||'';
+      const rankTag = rankC>0?`<span class="ct-rank-tag">${medal}+${rankC}</span>`:'';
       junHtml=`<div class="ct-jun">
-        <span class="ct-jun-lbl">Jun 🪙</span>
-        <span class="ct-jun-val">${jun.weeklyCoinsJun}</span>
+        <span class="ct-jun-lbl">Jun 🪙 total</span>
+        <span class="ct-jun-val">${junTotal}</span>
       </div>
-      ${jun.weeks.length?`<div class="ct-wk-grid">${wkGrid}</div>`:''}`;
+      <div class="ct-wk-grid">${wkGrid}
+        ${semC>0?`<div class="ct-wk hit"><div class="ct-wk-lbl">sem</div><div class="ct-wk-val">${semC}c</div></div>`:''}
+        ${mesB>0?`<div class="ct-wk hit"><div class="ct-wk-lbl">mês</div><div class="ct-wk-val">${mesB}c</div></div>`:''}
+        ${rankC>0?`<div class="ct-wk hit"><div class="ct-wk-lbl">${medal}</div><div class="ct-wk-val">${rankC}c</div></div>`:''}
+      </div>`;
     }
-
-    // rank do dia turbo — só mostra se ganhou coin
-    const medal = medals[ri]||'';
-    const rankHtml = (pctR>=100 && rankC>0)
-      ? `<div class="ct-rank hit">${medal} +${rankC}c turbo</div>`
-      : '';
 
     return `<div class="coin-tile ${isTop?'top':''}">
       <div class="ct-name">${m.nome}</div>
       <div class="ct-stars">${stars(base)}</div>
       <div class="ct-total">${base}<span class="ct-plus"> +${semC+mesB+rankC}?</span></div>
-      <div class="ct-sub">pot: +${semC+mesB+rankC}</div>
+      <div class="ct-sub">conf: ${base} · pot: +${semC+mesB+rankC}</div>
       ${statsHtml}
       ${junHtml}
-      ${rankHtml}
     </div>`;
   }).join('');
 }
