@@ -243,7 +243,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
     </div>
     <div class="comp-card">
       <div class="comp-h">📅 Meta Semanal <span class="comp-rule">3c ≥100% · 5c ≥120%</span></div>
-      <div class="comp-sub">Semana atual (29/jun+) · meta 100% = 3 coins · meta 120% = 5 coins</div>
+      <div class="comp-sub">Sem 5 (29/jun+) · pontos: 3c ≥100% · 5c ≥120% · rotina: 1c ≥60% · 2c ≥80% · 3c ≥100%</div>
       <div id="rank-sem"></div>
     </div>
     <div class="comp-card">
@@ -460,7 +460,7 @@ function calcSemCoins(key) {
 
 function calcMesPct(key) {
   if (!MONTHLY_GOAL[key]) return null;
-  const total = PTS_MES_ANTES_HOJE[key] + live[key].ptsHoje;
+  const total = PTS_MES_ANTES_HOJE[key] + (SEM_ATUAL_BASE[key]?.pts||0) + live[key].ptsHoje;
   return { pct:(total/MONTHLY_GOAL[key])*100, total, falta:Math.max(0,MONTHLY_GOAL[key]-total) };
 }
 
@@ -667,22 +667,23 @@ function renderCards() {
         <div class="btrack"><div class="bfill" style="${bfillStyle(mes.pct)};width:${clamp(mes.pct)}%"></div></div>
       </div>`;
     } else if(m.key==='malu'){
-      const rp=SEM_ATUAL_BASE.malu?.rotinaPct||0;
+      const rp=ROTINA_DATA.malu?.today?.pct??SEM_ATUAL_BASE.malu?.rotinaPct??0;
       weekHtml=`<div class="bar-item">
         <div class="bar-head"><span class="bar-lbl">Rotina semanal</span><span class="bar-pct" style="color:${perfColor(rp)}">${rp}%</span></div>
         <div class="btrack"><div class="bfill" style="${bfillStyle(rp)};width:${clamp(rp)}%"></div></div>
       </div>`;
     } else if(m.key==='gustavo'){
-      const gp=SEM_ATUAL_BASE.gustavo?.rotinaPct||0;
+      const gp=ROTINA_DATA.gustavo?.today?.pct??SEM_ATUAL_BASE.gustavo?.rotinaPct??0;
       weekHtml=`<div class="bar-item">
         <div class="bar-head"><span class="bar-lbl">Rotina semanal</span><span class="bar-pct" style="color:${perfColor(gp)}">${gp}%</span></div>
         <div class="btrack"><div class="bfill" style="${bfillStyle(gp)};width:${clamp(gp)}%"></div></div>
       </div>`;
     } else {
+      const zRot=ROTINA_DATA.zion?.today?.pct??SEM_ATUAL_BASE.zion?.ugcPct??0;
       const z=SEM_ATUAL_BASE.zion||{};
       weekHtml=`<div class="bar-item">
-        <div class="bar-head"><span class="bar-lbl">UGC postado</span><span class="bar-pct" style="color:${perfColor(z.ugcPct||0)}">${z.ugcPct||0}%</span></div>
-        <div class="btrack"><div class="bfill" style="${bfillStyle(z.ugcPct||0)};width:${clamp(z.ugcPct||0)}%"></div></div>
+        <div class="bar-head"><span class="bar-lbl">UGC postado</span><span class="bar-pct" style="color:${perfColor(zRot)}">${zRot}%</span></div>
+        <div class="btrack"><div class="bfill" style="${bfillStyle(zRot)};width:${clamp(zRot)}%"></div></div>
       </div>
       <div class="bar-item">
         <div class="bar-head"><span class="bar-lbl">Pts extras</span><span class="bar-pct" style="color:var(--gold)">${(z.extraPts||0)+d.ptsHoje}/50</span></div>
@@ -698,13 +699,12 @@ function renderCards() {
     const mesBonus= mesObj && mesObj.pct>=100 ? 3 : 0;
     if(mesBonus>0) coinTotal+=mesBonus;
     const rankCoins= rankIdx===0?3:rankIdx===1?2:rankIdx===2?1:0;
-    if(prodPct>=100) coinTotal += rankCoins;
+    coinTotal += rankCoins;
 
     const breakParts=[];
     if(semCoins>0) breakParts.push('sem: '+semCoins);
     if(mesBonus>0) breakParts.push('+3 mensal');
-    if(rankCoins>0 && prodPct>=100) breakParts.push('+'+rankCoins+' rank');
-    else if(rankCoins>0) breakParts.push('🔒rank (coef<100%)');
+    if(rankCoins>0) breakParts.push('+'+rankCoins+' rank');
 
     // tasks mini
     const taskHtml = d.tasks.length>0
@@ -756,6 +756,15 @@ function renderCards() {
 
 // ── RENDER: PRODUTIVIDADE ─────────────────────────────────────────────
 function renderProd() {
+  const todayStr = new Date().toISOString().slice(0,10);
+  if (todayStr < EVENTO_DATA) {
+    document.getElementById('rank-prod').innerHTML =
+      `<div style="text-align:center;padding:28px 8px;color:var(--muted);font-size:12px;line-height:1.6">
+        🔒 Ranking ativa às 8h do dia 30/jun<br>
+        <span style="font-size:10px;opacity:.6">Produtividade do Dia de Turbo</span>
+      </div>`;
+    return;
+  }
   const ranked = [...TEAM].map(m=>({nome:m.nome,key:m.key,pct:calcProdDia(m.key)})).sort((a,b)=>b.pct-a.pct);
   const maxV = Math.max(...ranked.map(r=>r.pct),1);
   const coins = [3,2,1];
@@ -791,34 +800,37 @@ function renderSem() {
         <div class="gl-badge ${hit?(over?'over':'hit'):'no'}">${hit?(over?'🔥 '+c+'c':'✓ '+c+'c'):'—'}</div>
       </div>`;
     } else if(m.key==='malu'){
-      const rp=SEM_ATUAL_BASE.malu?.rotinaPct||0, hit=rp>=100;
+      const rp=ROTINA_DATA.malu?.today?.pct??SEM_ATUAL_BASE.malu?.rotinaPct??0;
+      const mc=rp>=100?3:rp>=80?2:rp>=60?1:0;
       return `<div class="gl-row">
         <div class="gl-name">Malu</div>
         <div class="gl-mid">
           <div class="gl-top"><span class="gl-pct" style="color:${perfColor(rp)}">${rp}% rotina</span></div>
           <div class="gl-track"><div class="gl-fill" style="${bfillStyle(rp)};width:${clamp(rp)}%"></div></div>
         </div>
-        <div class="gl-badge ${hit?'hit':'no'}">${hit?'✓ 3c':'—'}</div>
+        <div class="gl-badge ${mc>0?'hit':'no'}">${mc>0?'✓ '+mc+'c':'—'}</div>
       </div>`;
     } else if(m.key==='gustavo'){
-      const gp=SEM_ATUAL_BASE.gustavo?.rotinaPct||0, gHit=gp>=100;
+      const gp=ROTINA_DATA.gustavo?.today?.pct??SEM_ATUAL_BASE.gustavo?.rotinaPct??0;
+      const gc=gp>=100?3:gp>=80?2:gp>=60?1:0;
       return `<div class="gl-row">
         <div class="gl-name">Gustavo</div>
         <div class="gl-mid">
           <div class="gl-top"><span class="gl-pct" style="color:${perfColor(gp)}">${gp}% rotina</span></div>
           <div class="gl-track"><div class="gl-fill" style="${bfillStyle(gp)};width:${clamp(gp)}%"></div></div>
         </div>
-        <div class="gl-badge ${gHit?'hit':'no'}">${gHit?'✓ 3c':'—'}</div>
+        <div class="gl-badge ${gc>0?'hit':'no'}">${gc>0?'✓ '+gc+'c':'—'}</div>
       </div>`;
     } else {
-      const z=SEM_ATUAL_BASE.zion||{}, ugcHit=(z.ugcPct||0)>=100;
+      const zp=ROTINA_DATA.zion?.today?.pct??SEM_ATUAL_BASE.zion?.ugcPct??0;
+      const zc=zp>=100?3:zp>=80?2:zp>=60?1:0;
       return `<div class="gl-row">
         <div class="gl-name">Zion</div>
         <div class="gl-mid">
-          <div class="gl-top"><span class="gl-pct" style="color:${perfColor(z.ugcPct||0)}">UGC ${z.ugcPct||0}%</span></div>
-          <div class="gl-track"><div class="gl-fill" style="${bfillStyle(z.ugcPct||0)};width:${clamp(z.ugcPct||0)}%"></div></div>
+          <div class="gl-top"><span class="gl-pct" style="color:${perfColor(zp)}">UGC ${zp}%</span></div>
+          <div class="gl-track"><div class="gl-fill" style="${bfillStyle(zp)};width:${clamp(zp)}%"></div></div>
         </div>
-        <div class="gl-badge ${ugcHit?'hit':'no'}">${ugcHit?'✓ 2c':'—'}</div>
+        <div class="gl-badge ${zc>0?'hit':'no'}">${zc>0?'✓ '+zc+'c':'—'}</div>
       </div>`;
     }
   }).join('');
