@@ -1,0 +1,986 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dia de Turbo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07071a; --card:#0f0f26; --card2:#13133a;
+  --gold:#FFD700; --gold2:#FFA500; --green:#22c55e;
+  --red:#ef4444; --orange:#f97316; --blue:#60a5fa;
+  --muted:#64748b; --text:#f1f5f9; --border:rgba(255,215,0,.1);
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;padding:18px;min-height:100vh}
+
+/* ── HEADER ── */
+.header{background:linear-gradient(135deg,#0f0f26,#1a1050);border:1px solid var(--border);border-radius:20px;padding:18px 26px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between}
+.ev-name{font-size:26px;font-weight:900;background:linear-gradient(135deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ev-date{font-size:12px;color:var(--muted);margin-top:3px}
+.hdr-right{display:flex;align-items:center;gap:18px}
+.live-pill{display:flex;align-items:center;gap:7px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:600;color:var(--green)}
+.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.hdr-clock{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--gold);letter-spacing:2px}
+
+/* ── SECTION ── */
+.section-title{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.block{margin-bottom:22px}
+
+/* ── PERSON CARDS ── */
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.p-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 18px;position:relative;transition:border-color .3s,box-shadow .3s;overflow:hidden}
+.p-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--accent,#FFD700),transparent);opacity:0;transition:opacity .5s}
+.p-card.glow{border-color:rgba(255,215,0,.4);box-shadow:0 0 40px rgba(255,215,0,.09)}
+.p-card.glow::after{opacity:1}
+
+/* medal badge */
+.medal-badge{position:absolute;top:12px;right:12px;font-size:22px;line-height:1}
+
+/* card header */
+.c-head{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;flex-shrink:0}
+.c-name{font-size:15px;font-weight:800;line-height:1}
+.c-cargo{font-size:10px;color:var(--muted);margin-top:2px}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-left:auto}
+.sdot.on{background:var(--green);box-shadow:0 0 6px rgba(34,197,94,.5)}
+.sdot.off{background:var(--muted)}
+
+/* ring + daily info */
+.ring-row{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.ring-wrap{position:relative;width:96px;height:96px;flex-shrink:0}
+.ring-wrap svg{width:96px;height:96px}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-pct{font-size:19px;font-weight:900;line-height:1}
+.ring-lbl{font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.daily-info{flex:1}
+.di-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.di-pts{font-size:30px;font-weight:900;line-height:1;color:var(--gold)}
+.di-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.di-falta{font-size:11px;font-weight:700;margin-top:7px;padding:3px 10px;border-radius:20px;display:inline-block}
+.di-falta.ok{background:rgba(34,197,94,.15);color:var(--green)}
+.di-falta.near{background:rgba(255,215,0,.12);color:var(--gold)}
+.di-falta.warn{background:rgba(249,115,22,.12);color:var(--orange)}
+.di-falta.crit{background:rgba(239,68,68,.12);color:var(--red)}
+
+/* bars */
+.bars{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.bar-item{}
+.bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.bar-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.bar-right{display:flex;align-items:center;gap:7px}
+.bar-pct{font-size:12px;font-weight:700}
+.tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px}
+.tag.hit{background:rgba(34,197,94,.18);color:var(--green)}
+.tag.over{background:rgba(255,215,0,.18);color:var(--gold)}
+.tag.go{background:rgba(255,255,255,.06);color:var(--muted)}
+.btrack{height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.bfill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.bfill.gold{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.bfill.green{background:linear-gradient(90deg,var(--green),#16a34a)}
+.bfill.orange{background:linear-gradient(90deg,var(--orange),#ea580c)}
+.bfill.red{background:linear-gradient(90deg,var(--red),#b91c1c)}
+.bfill.blue{background:linear-gradient(90deg,var(--blue),#2563eb)}
+
+/* tasks mini */
+.tasks-mini{display:flex;flex-direction:column;gap:2px;max-height:72px;overflow-y:auto;margin-bottom:12px}
+.t-row{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.t-n{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-p{font-size:9px;font-weight:700;color:var(--gold);flex-shrink:0}
+
+/* coin preview */
+.coin-box{background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.14);border-radius:10px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
+.cb-left{}
+.cb-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.cb-val{font-size:20px;font-weight:900;color:var(--gold);line-height:1.1}
+.cb-break{font-size:9px;color:var(--muted);margin-top:1px}
+.cb-right{font-size:11px;color:var(--muted);text-align:right}
+
+/* ── COMPETITION PANEL ── */
+.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:22px}
+.comp-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px}
+.comp-h{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.comp-rule{font-size:9px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);border-radius:8px;padding:2px 8px;color:var(--gold);margin-left:auto;white-space:nowrap}
+.comp-sub{font-size:10px;color:var(--muted);margin-bottom:14px}
+
+/* ranking rows */
+.rk-row{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.rk-pos{width:22px;text-align:center;font-size:15px;line-height:1;flex-shrink:0}
+.rk-name{width:52px;font-size:12px;font-weight:700;flex-shrink:0}
+.rk-track{flex:1;height:22px;background:rgba(255,255,255,.05);border-radius:6px;overflow:hidden}
+.rk-fill{height:100%;display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:700;border-radius:6px;transition:width .8s cubic-bezier(.4,0,.2,1);min-width:42px}
+.rk-fill.p1{background:linear-gradient(90deg,#FFD700,#FFA500);color:#000}
+.rk-fill.p2{background:linear-gradient(90deg,#94a3b8,#64748b);color:#fff}
+.rk-fill.p3{background:linear-gradient(90deg,#c2956a,#9a7040);color:#fff}
+.rk-fill.pn{background:rgba(255,255,255,.1);color:var(--muted)}
+.rk-coin{font-size:11px;font-weight:800;width:36px;text-align:right;flex-shrink:0;color:var(--gold)}
+.rk-coin.dim{color:rgba(255,255,255,.2)}
+
+/* goal rows */
+.gl-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.gl-name{width:52px;font-size:12px;font-weight:700;flex-shrink:0}
+.gl-mid{flex:1}
+.gl-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.gl-pct{font-size:11px;font-weight:700}
+.gl-need{font-size:10px;color:var(--muted)}
+.gl-track{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.gl-fill{height:100%;border-radius:3px;transition:width .8s ease}
+.gl-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:8px;flex-shrink:0}
+.gl-badge.hit{background:rgba(34,197,94,.2);color:var(--green)}
+.gl-badge.over{background:rgba(255,215,0,.2);color:var(--gold)}
+.gl-badge.no{background:rgba(255,255,255,.06);color:var(--muted)}
+
+/* ── COINS TOTAL ── */
+.coins-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
+.coins-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px}
+.coin-tile{background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.1);border-radius:12px;padding:12px;text-align:center;transition:border-color .3s}
+.coin-tile.top{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.1);box-shadow:0 0 20px rgba(255,215,0,.08)}
+.ct-name{font-size:12px;font-weight:700;margin-bottom:6px}
+.ct-stars{font-size:15px;min-height:20px;letter-spacing:1px}
+.ct-total{font-size:20px;font-weight:900;color:var(--gold);line-height:1}
+.ct-plus{font-size:12px;color:rgba(255,215,0,.5)}
+.ct-sub{font-size:9px;color:var(--muted);margin-top:3px;margin-bottom:6px}
+.ct-stat{display:flex;justify-content:space-between;align-items:center;margin-top:4px;gap:4px}
+.ct-sl{font-size:10px;color:var(--muted);white-space:nowrap}
+.ct-sr{font-size:10px;color:var(--muted);white-space:nowrap}
+.ct-jun{display:flex;justify-content:space-between;align-items:center;margin-top:7px;padding-top:6px;border-top:1px solid rgba(255,215,0,.12)}
+.ct-jun-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.ct-jun-val{font-size:15px;font-weight:900;color:var(--gold)}
+.ct-wk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-top:5px}
+.ct-wk{text-align:center;padding:4px 2px;border-radius:5px;background:rgba(255,255,255,.04)}
+.ct-wk.hit{background:rgba(255,215,0,.15)}
+.ct-wk-lbl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.ct-wk-val{font-size:11px;font-weight:700;color:var(--muted)}
+.ct-wk.hit .ct-wk-val{color:var(--gold)}
+.ct-rank{margin-top:6px;padding:4px 8px;border-radius:7px;font-size:10px;font-weight:700;text-align:center}
+.ct-rank.hit{background:rgba(255,215,0,.18);color:var(--gold)}
+.ct-rank.lock{background:rgba(239,68,68,.1);color:#f87171}
+.ct-rank.dim{background:rgba(255,255,255,.04);color:var(--muted);font-weight:500}
+
+/* ── PRE-EVENT ── */
+.pre-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:300}
+.pre-title{font-size:34px;font-weight:900;background:linear-gradient(135deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;text-align:center}
+.pre-sub{font-size:15px;color:var(--muted);margin-bottom:52px}
+.pre-clock{font-size:84px;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:6px;margin-bottom:12px;text-shadow:0 0 60px rgba(255,215,0,.25)}
+.pre-lbl{font-size:13px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.pre-info{margin-top:40px;font-size:12px;color:rgba(255,255,255,.2);text-align:center}
+
+/* ── FROZEN ── */
+.frozen-bar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(8,8,22,.96);backdrop-filter:blur(12px);border-bottom:2px solid var(--gold);padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:16px}
+
+/* ── CONFIG WARN ── */
+.cfg-warn{background:rgba(249,115,22,.09);border:1px solid rgba(249,115,22,.3);border-radius:10px;padding:10px 16px;margin-bottom:18px;font-size:12px;color:#fb923c}
+
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,215,0,.2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- PRE-EVENT -->
+<div class="pre-screen" id="pre-event" style="display:none">
+  <div class="pre-title" id="pre-title">Dia de Turbo</div>
+  <div class="pre-sub">O painel ativa automaticamente às 8h00</div>
+  <div class="pre-clock" id="pre-clock">--:--:--</div>
+  <div class="pre-lbl">faltam para o início</div>
+  <div class="pre-info" id="pre-info"></div>
+  <button onclick="document.getElementById('pre-event').style.display='none';document.getElementById('main').style.display='block';startDashboard();" style="margin-top:32px;background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.3);color:#FFD700;font-size:13px;font-weight:700;padding:10px 24px;border-radius:20px;cursor:pointer;letter-spacing:.5px">
+    👁 Visualizar painel agora
+  </button>
+</div>
+
+<!-- FROZEN BAR -->
+<div class="frozen-bar" id="frozen-bar" style="display:none">
+  <span style="font-size:18px">🔒</span>
+  <div>
+    <div style="font-size:14px;font-weight:700;color:var(--gold)">Resultado final: painel encerrado</div>
+    <div style="font-size:11px;color:var(--muted)" id="frozen-sub">Dados salvos à meia-noite</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main" style="display:none">
+
+<div class="cfg-warn" id="cfg-warn" style="display:none">
+  ⚠️ Preencha <b>PTS_MES_ANTES_HOJE</b>, <b>SEM_ATUAL_BASE</b> e <b>COINS_ANTERIORES</b> no código antes do evento.
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="ev-name" id="ev-name">Dia de Turbo</div>
+    <div class="ev-date" id="ev-date"></div>
+  </div>
+  <div class="hdr-right">
+    <div class="live-pill" id="live-pill">
+      <div class="live-dot"></div>
+      <span>Ao vivo · <span id="cdown">60</span>s</span>
+    </div>
+    <div class="hdr-clock" id="clock">00:00:00</div>
+  </div>
+</div>
+
+<!-- EQUIPE -->
+<div class="block">
+  <div class="section-title">👥 Performance do Time</div>
+  <div class="cards-grid" id="cards"></div>
+</div>
+
+<!-- COMPETIÇÕES -->
+<div class="block">
+  <div class="section-title">🏆 Competições do Dia</div>
+  <div class="comp-grid">
+    <div class="comp-card">
+      <div class="comp-h">⚡ Produtividade do Dia <span class="comp-rule">🥇+3 · 🥈+2 · 🥉+1 coin</span></div>
+      <div class="comp-sub">Coef. = horas + tasks + rotina/UGC + % meta diária · coins só para top 3 com coef ≥ 100%</div>
+      <div id="rank-prod"></div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-h">📅 Meta Semanal <span class="comp-rule">coins normais</span></div>
+      <div class="comp-sub">Quem bater a meta semanal ganha os coins padrão</div>
+      <div id="rank-sem"></div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-h">🗓️ Meta Mensal <span class="comp-rule">+3 coins extra</span></div>
+      <div class="comp-sub">Bater a meta do mês rende +3 coins além dos semanais</div>
+      <div id="rank-mes"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SB COINS -->
+<div class="block">
+  <div class="section-title">🪙 SB Coins — Total do Mês</div>
+  <div class="coins-panel">
+    <div class="coins-row" id="coins-row"></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// ⚠️  PREENCHER ANTES DO EVENTO
+// ═══════════════════════════════════════════════════════════════════
+
+const EVENTO_NOME = 'Dia de Turbo — 30 Jun';
+const EVENTO_DATA = '2026-06-30';
+
+// Meta de pontos DIÁRIA para o coeficiente de produtividade
+// Padrão: samuel=26, thiago=16, klenio=16, bia=6
+// Com captação de manhã: thiago=26, klenio=26
+const DAILY_TARGET = { samuel:26, thiago:16, klenio:16, bia:6 };
+
+// Se alguém tiver task acumulando horas de dias anteriores, subtrair aqui
+const HORAS_AJUSTE = { samuel:0, thiago:0, klenio:0, bia:0, malu:0, zion:0 };
+
+// Pontos acumulados no MÊS inteiro ANTES de hoje
+const PTS_MES_ANTES_HOJE = {
+  samuel:448,
+  thiago:165,
+  klenio:185,
+  bia:    63,
+};
+
+// Pontos da SEMANA ATUAL acumulados ANTES de hoje (seg 29/jun)
+const SEM_ATUAL_BASE = {
+  samuel:{ pts:4 },
+  thiago:{ pts:0 },
+  klenio:{ pts:0 },
+  bia:   { pts:0 },
+  malu:  { rotinaPct:0, extraPts:0 },
+  zion:  { ugcPct:0, postPct:0, extraPts:0 },
+  gustavo:{ rotinaPct:0, extraPts:0 },
+};
+
+// SB Coins confirmados ANTES deste evento
+const COINS_ANTERIORES = {
+  samuel:0, thiago:0, klenio:0, bia:0, malu:0, zion:0, gustavo:0,
+};
+
+// Rotina % por pessoa — preenchido via MKT Hub (loadRotinaFromMktHub)
+const ROTINA_DATA = {}; // key -> { today:{done,total,pct}, month:{done,total,pct} }
+// Tasks mensais ClickUp — preenchido via fetchMonthData
+const mesData = {};
+// Coins de junho por pessoa — preenchido via loadJunhoBreakdown
+const JUNHO_DATA = {}; // key -> { ledgerTotal, weeklyCoinsJun, weeks }
+
+// Histórico de semanas anteriores do mês (para referência interna)
+// Pontos:  { sem:1, pct:103, pts:135, coins:3 }
+// Rotina:  { sem:1, rotinaPct:100, extraPts:0, coins:3 }
+// UGC:     { sem:1, ugcPct:60, postPct:70, extraPts:71, coins:2 }
+const HISTORY = {
+  samuel:[], thiago:[], klenio:[], bia:[], malu:[], zion:[], gustavo:[], // ← PREENCHER
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// FIXOS — não alterar
+// ═══════════════════════════════════════════════════════════════════
+
+const API_TOKEN  = 'pk_112066305_IK3V9GU33TA7WYJ8OXQJ6GGPH3DW8BIT';
+const LIST_ID    = '901321051391';
+const API_BASE   = 'https://api.clickup.com/api/v2';
+const HDR        = { 'Authorization': API_TOKEN };
+const FREEZE_KEY = 'sbdash_' + EVENTO_DATA.replace(/-/g,'_');
+
+const MKTHUB_API = 'https://mktimer45.vercel.app';
+const MKTHUB_KEY = 'sb-turbo-2026-coins';
+
+const TEAM = [
+  { key:'samuel',  nome:'Samuel',  email:'samuel.melo@grupoquatro5.com',                                          cargo:'Diretor de Arte',      grupo:'pontos', color:'#3b82f6', id:null },
+  { key:'thiago',  nome:'Thiago',  email:'thiago.nascimento@grupoquatro5.com',                                     cargo:'Editor / Audiovisual', grupo:'pontos', color:'#8b5cf6', id:null },
+  { key:'klenio',  nome:'Klenio',  email:'klenio.braz@grupoquatro5.com',                                           cargo:'Editor / Audiovisual', grupo:'pontos', color:'#06b6d4', id:null },
+  { key:'bia',     nome:'Bia',     email:'anny.beatriz@grupoquatro5.com',                                          cargo:'Estagiária LP & IA',   grupo:'pontos', color:'#f43f5e', id:null },
+  { key:'malu',    nome:'Malu',    email:'marialuiza.mariz@grupoquatro5.com',                                      cargo:'Storymaker',           grupo:'rotina', color:'#22c55e', id:null },
+  { key:'zion',    nome:'Zion',    email:'zion.bagatoli@grupoquatro5.com',                                         cargo:'Publisher / UGC',      grupo:'ugc',    color:'#f97316', id:null },
+  { key:'gustavo', nome:'Gustavo', email:'rochacarbone@gmail.com', mktEmail:'gustavo.rocha@carbonecompany.com.br', cargo:'Tráfego Pago',         grupo:'rotina', color:'#a855f7', id:null },
+];
+
+const WEEKLY_GOALS = {
+  samuel:{ meta100:130, meta120:156, coins100:3, coins120:5 },
+  thiago:{ meta100:80,  meta120:96,  coins100:3, coins120:5 },
+  klenio:{ meta100:80,  meta120:96,  coins100:3, coins120:5 },
+  bia:   { meta100:30,  meta120:36,  coins100:3, coins120:3 },
+};
+const MONTHLY_GOAL = { samuel:520, thiago:260, klenio:260, bia:120 };
+
+// ── TIMING ──────────────────────────────────────────────────────────
+const _evDay    = new Date(EVENTO_DATA + 'T00:00:00');
+const EV_START  = new Date(EVENTO_DATA + 'T08:00:00');
+const FREEZE_AT = new Date(_evDay.getFullYear(), _evDay.getMonth(), _evDay.getDate()+1, 0, 0, 0);
+
+// ── STATE ────────────────────────────────────────────────────────────
+let pointsFieldId = null;
+let countdown = 60, pollInterval = null, isFrozen = false;
+
+const live = {};
+TEAM.forEach(m => { live[m.key] = { tasksTotal:0, tasksDone:0, ptsHoje:0, horasHoje:0, tasks:[] }; });
+TEAM.forEach(m => { mesData[m.key] = { tasksDone:0, pts:0 }; });
+
+// ── API & UTILS ──────────────────────────────────────────────────────
+const apiGet = p => fetch(API_BASE+p, { headers:HDR }).then(r=>r.json());
+const pad    = v => String(v).padStart(2,'0');
+const clamp  = (v,mx=100) => Math.min(mx, Math.max(0, v));
+const stars  = n => '⭐'.repeat(Math.max(0,n));
+
+const STATUS_EX = ['pendente','em andamento','em progresso','in progress','alteraç','alterac','revisão','revisao','aberto','open','to do','todo'];
+function isComplete(t) {
+  const s  = (t.status?.status||'').toLowerCase().trim();
+  const tp = (t.status?.type  ||'').toLowerCase().trim();
+  if (STATUS_EX.some(ex => s.includes(ex))) return false;
+  return s.includes('aprovar')||s.includes('approve')||s.includes('publicar')
+      ||s.includes('banco de criativos')||s==='complete'||s==='done'||s==='closed'
+      ||s==='completo'||s==='concluído'||s==='concluida'||s==='concluido'||s==='finalizado'
+      ||tp==='closed';
+}
+function getTaskPts(t) {
+  if (!pointsFieldId||!t.custom_fields) return 0;
+  const f = t.custom_fields.find(f=>f.id===pointsFieldId);
+  if (!f) return 0;
+  const v = parseFloat(f.value??f.value_richtext??'');
+  return isNaN(v)?0:v;
+}
+function eventDayMs() {
+  const d = new Date(EVENTO_DATA+'T00:00:00');
+  return { start:d.getTime(), end:d.getTime()+86399999 };
+}
+
+// ── FORMULAS ─────────────────────────────────────────────────────────
+
+// PRODUTIVIDADE = só pontos do DIA vs meta DIÁRIA
+function calcProdDia(key) {
+  const d = live[key];
+  const isPts = ['samuel','thiago','klenio','bia'].includes(key);
+  const withH = TEAM.some(m=>live[m.key].horasHoje>0.01);
+  const A = isPts && DAILY_TARGET[key]>0 ? Math.min(d.ptsHoje/DAILY_TARGET[key],1.5) : 0;
+  const B = d.tasksTotal>0 ? Math.min(d.tasksDone/d.tasksTotal,1) : 0;
+  const C = Math.min(d.horasHoje/16,1.5);
+  if (isPts) return withH ? (A*.50+B*.35+C*.15)*100 : (A*.60+B*.40)*100;
+  return withH ? (B*.70+C*.30)*100 : B*100;
+}
+
+function calcSemPct(key) {
+  if (!WEEKLY_GOALS[key]) return null;
+  const total = (SEM_ATUAL_BASE[key]?.pts||0) + live[key].ptsHoje;
+  return { pct:(total/WEEKLY_GOALS[key].meta100)*100, total, falta:Math.max(0,WEEKLY_GOALS[key].meta100-total) };
+}
+function calcSemCoins(key) {
+  if (!WEEKLY_GOALS[key]) return null;
+  const total = (SEM_ATUAL_BASE[key]?.pts||0) + live[key].ptsHoje;
+  if (total>=WEEKLY_GOALS[key].meta120) return WEEKLY_GOALS[key].coins120;
+  if (total>=WEEKLY_GOALS[key].meta100) return WEEKLY_GOALS[key].coins100;
+  return 0;
+}
+
+function calcMesPct(key) {
+  if (!MONTHLY_GOAL[key]) return null;
+  const total = PTS_MES_ANTES_HOJE[key] + live[key].ptsHoje;
+  return { pct:(total/MONTHLY_GOAL[key])*100, total, falta:Math.max(0,MONTHLY_GOAL[key]-total) };
+}
+
+// ── COLORS ──────────────────────────────────────────────────────────
+function perfColor(pct) {
+  if (pct>=100) return '#22c55e';
+  if (pct>=75)  return '#FFD700';
+  if (pct>=50)  return '#f97316';
+  return '#ef4444';
+}
+function barClass(pct) {
+  if (pct>=100) return 'green';
+  if (pct>=75)  return 'gold';
+  if (pct>=50)  return 'orange';
+  return 'red';
+}
+function bfillStyle(pct) {
+  if (pct>=100) return 'background:linear-gradient(90deg,#22c55e,#16a34a)';
+  if (pct>=75)  return 'background:linear-gradient(90deg,#FFD700,#FFA500)';
+  if (pct>=50)  return 'background:linear-gradient(90deg,#f97316,#ea580c)';
+  return 'background:linear-gradient(90deg,#ef4444,#b91c1c)';
+}
+
+// ── RING SVG ─────────────────────────────────────────────────────────
+function makeRing(pct, color) {
+  const R = 40, circ = 2*Math.PI*R;
+  const off = circ - Math.min(pct/100,1)*circ;
+  return `
+    <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="48" cy="48" r="${R}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="8"/>
+      <circle cx="48" cy="48" r="${R}" fill="none" stroke="${color}" stroke-width="8"
+        stroke-linecap="round"
+        stroke-dasharray="${circ.toFixed(2)}"
+        stroke-dashoffset="${off.toFixed(2)}"
+        transform="rotate(-90 48 48)"
+        style="transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)"/>
+    </svg>`;
+}
+
+// ── FREEZE ───────────────────────────────────────────────────────────
+function freeze() {
+  if (isFrozen) return;
+  isFrozen = true;
+  clearInterval(pollInterval);
+  try { localStorage.setItem(FREEZE_KEY, JSON.stringify({ live:JSON.parse(JSON.stringify(live)), frozenAt:new Date().toISOString() })); } catch(e){}
+  renderDynamic();
+  showFrozenBar();
+  document.getElementById('live-pill').style.display='none';
+}
+function tryRestoreFrozen() {
+  try {
+    const raw = localStorage.getItem(FREEZE_KEY);
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    TEAM.forEach(m=>{ if(s.live?.[m.key]) Object.assign(live[m.key],s.live[m.key]); });
+    isFrozen = true;
+    showFrozenBar(s.frozenAt);
+    return true;
+  } catch(e){ return false; }
+}
+function showFrozenBar(iso) {
+  const b = document.getElementById('frozen-bar');
+  b.style.display = 'flex';
+  if (iso) {
+    const dt = new Date(iso);
+    document.getElementById('frozen-sub').textContent =
+      'Dados de '+dt.toLocaleDateString('pt-BR')+' salvos às '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }
+  document.getElementById('main').style.marginTop='54px';
+}
+
+// ── CLOCK ────────────────────────────────────────────────────────────
+function startClock() {
+  setInterval(()=>{
+    const n = new Date();
+    document.getElementById('clock').textContent = pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
+    if (!isFrozen) {
+      if (n>=FREEZE_AT){ freeze(); return; }
+      if (countdown>0) countdown--;
+      document.getElementById('cdown').textContent = countdown;
+    }
+  },1000);
+}
+
+// ── PRE-EVENT ────────────────────────────────────────────────────────
+function showPreEvent() {
+  const ov = document.getElementById('pre-event');
+  ov.style.display = 'flex';
+  document.getElementById('pre-title').textContent = EVENTO_NOME;
+  document.getElementById('pre-info').textContent  = 'Evento em '+_evDay.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  const tick = setInterval(()=>{
+    const now = new Date();
+    if (now>=EV_START){ clearInterval(tick); ov.style.display='none'; document.getElementById('main').style.display='block'; startDashboard(); return; }
+    const d = EV_START-now;
+    document.getElementById('pre-clock').textContent = pad(Math.floor(d/3600000))+':'+pad(Math.floor((d%3600000)/60000))+':'+pad(Math.floor((d%60000)/1000));
+  },1000);
+}
+
+// ── API INIT ─────────────────────────────────────────────────────────
+async function resolveMembers() {
+  try {
+    (await apiGet('/list/'+LIST_ID+'/member')).members?.forEach(m=>{
+      const f = TEAM.find(t=>t.email.toLowerCase()===(m.email||'').toLowerCase());
+      if(f){ f.id=m.id; console.log('[Match]',f.key,m.id); }
+    });
+    TEAM.filter(t=>!t.id).forEach(t=>console.warn('[Sem ID]',t.key));
+  } catch(e){ console.warn('resolveMembers',e); }
+}
+async function resolveField() {
+  try {
+    const flds = (await apiGet('/list/'+LIST_ID+'/field')).fields||[];
+    const f = flds.find(f=>{
+      const n=f.name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+      return (n.includes('pontu')||n.includes('ponto'))&&(n.includes('atividade')||n.includes('mkt'));
+    });
+    if(f){ pointsFieldId=f.id; console.log('[Field]',f.name,f.id); }
+    else console.warn('[Field NOT FOUND]');
+  } catch(e){ console.warn('resolveField',e); }
+}
+
+// ── POLLING ──────────────────────────────────────────────────────────
+async function pollMember(m) {
+  if(!m.id||isFrozen) return;
+  try {
+    const {start,end}=eventDayMs();
+    const p=new URLSearchParams([['assignees[]',m.id],['due_date_gt',start],['due_date_lt',end],['include_closed','true'],['page','0']]);
+    const tasks=(await apiGet('/list/'+LIST_ID+'/task?'+p)).tasks||[];
+    const mapped=tasks.map(t=>({
+      name:t.name, status:(t.status?.status||''), done:isComplete(t),
+      pts:isComplete(t)?getTaskPts(t):0, rawPts:getTaskPts(t),
+      timeSpentMs:Number(t.time_spent)||0
+    }));
+    const raw=mapped.filter(t=>t.done).reduce((s,t)=>s+t.timeSpentMs,0)/3600000;
+    live[m.key]={
+      tasksTotal:tasks.length, tasksDone:mapped.filter(t=>t.done).length,
+      ptsHoje:mapped.reduce((s,t)=>s+t.pts,0),
+      horasHoje:Math.min(Math.max(0,raw-(HORAS_AJUSTE[m.key]||0)),16),
+      tasks:mapped
+    };
+  } catch(e){ console.warn('poll',m.key,e); }
+}
+async function doPoll() {
+  if(isFrozen) return;
+  await Promise.all(TEAM.map(m=>pollMember(m)));
+  renderDynamic();
+  countdown=60;
+}
+
+// ── RENDER: CARDS ────────────────────────────────────────────────────
+function renderCards() {
+  // Compute daily prod rank for medal overlay
+  const ranked = [...TEAM].map(m=>({key:m.key,pct:calcProdDia(m.key)})).sort((a,b)=>b.pct-a.pct);
+  const medals = ['🥇','🥈','🥉'];
+
+  document.getElementById('cards').innerHTML = TEAM.map(m=>{
+    const d    = live[m.key];
+    const isPts= m.grupo==='pontos';
+    const prodPct = calcProdDia(m.key);
+    const prodColor= perfColor(prodPct);
+    const rankIdx  = ranked.findIndex(r=>r.key===m.key);
+    const medal    = rankIdx<3 ? medals[rankIdx] : '';
+    const isGlow   = prodPct>=100;
+
+    // daily falta badge
+    let daily_falta='', daily_faltalabel='';
+    if(isPts){
+      const falta = Math.max(0, DAILY_TARGET[m.key]-d.ptsHoje);
+      if(falta===0){ daily_falta='ok'; daily_faltalabel='✓ meta diária'; }
+      else if(falta<=3){ daily_falta='near'; daily_faltalabel='faltam '+falta+' pts'; }
+      else if(prodPct>=50){ daily_falta='warn'; daily_faltalabel='faltam '+falta+' pts'; }
+      else { daily_falta='crit'; daily_faltalabel='faltam '+falta+' pts'; }
+    } else {
+      if(prodPct>=100){ daily_falta='ok'; daily_faltalabel='✓ tasks concluídas'; }
+      else { daily_falta='warn'; daily_faltalabel=d.tasksDone+'/'+d.tasksTotal+' tasks'; }
+    }
+
+    // weekly bar (only pontos group)
+    let weekHtml='', mesHtml='';
+    if(isPts){
+      const sem = calcSemPct(m.key);
+      const wpct= clamp(sem.pct,150);
+      const hit = sem.pct>=100;
+      const bsty= bfillStyle(sem.pct);
+      weekHtml=`<div class="bar-item">
+        <div class="bar-head">
+          <span class="bar-lbl">Meta Semanal</span>
+          <div class="bar-right">
+            <span class="bar-pct" style="color:${perfColor(sem.pct)}">${sem.pct.toFixed(0)}%</span>
+            <span class="tag ${hit?'hit':'go'}">${hit?'✓ batida':'faltam '+sem.falta+'pts'}</span>
+          </div>
+        </div>
+        <div class="btrack"><div class="bfill" style="${bsty};width:${clamp(sem.pct)}%"></div></div>
+      </div>`;
+      const mes = calcMesPct(m.key);
+      const mhit= mes.pct>=100;
+      weekHtml+=`<div class="bar-item">
+        <div class="bar-head">
+          <span class="bar-lbl">Meta Mensal</span>
+          <div class="bar-right">
+            <span class="bar-pct" style="color:${perfColor(mes.pct)}">${mes.pct.toFixed(0)}%</span>
+            <span class="tag ${mhit?mes.pct>100?'over':'hit':'go'}">${mhit?(mes.pct>100?'🔥 superada!':'✓ batida'):'faltam '+mes.falta+'pts'}</span>
+          </div>
+        </div>
+        <div class="btrack"><div class="bfill" style="${bfillStyle(mes.pct)};width:${clamp(mes.pct)}%"></div></div>
+      </div>`;
+    } else if(m.key==='malu'){
+      const rp=SEM_ATUAL_BASE.malu?.rotinaPct||0;
+      weekHtml=`<div class="bar-item">
+        <div class="bar-head"><span class="bar-lbl">Rotina semanal</span><span class="bar-pct" style="color:${perfColor(rp)}">${rp}%</span></div>
+        <div class="btrack"><div class="bfill" style="${bfillStyle(rp)};width:${clamp(rp)}%"></div></div>
+      </div>`;
+    } else if(m.key==='gustavo'){
+      const gp=SEM_ATUAL_BASE.gustavo?.rotinaPct||0;
+      weekHtml=`<div class="bar-item">
+        <div class="bar-head"><span class="bar-lbl">Rotina semanal</span><span class="bar-pct" style="color:${perfColor(gp)}">${gp}%</span></div>
+        <div class="btrack"><div class="bfill" style="${bfillStyle(gp)};width:${clamp(gp)}%"></div></div>
+      </div>`;
+    } else {
+      const z=SEM_ATUAL_BASE.zion||{};
+      weekHtml=`<div class="bar-item">
+        <div class="bar-head"><span class="bar-lbl">UGC postado</span><span class="bar-pct" style="color:${perfColor(z.ugcPct||0)}">${z.ugcPct||0}%</span></div>
+        <div class="btrack"><div class="bfill" style="${bfillStyle(z.ugcPct||0)};width:${clamp(z.ugcPct||0)}%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-head"><span class="bar-lbl">Pts extras</span><span class="bar-pct" style="color:var(--gold)">${(z.extraPts||0)+d.ptsHoje}/50</span></div>
+        <div class="btrack"><div class="bfill" style="${bfillStyle(((z.extraPts||0)+d.ptsHoje)/50*100)};width:${clamp(((z.extraPts||0)+d.ptsHoje)/50*100)}%"></div></div>
+      </div>`;
+    }
+
+    // coin potential
+    let coinTotal = COINS_ANTERIORES[m.key]||0;
+    const semCoins= calcSemCoins(m.key);
+    if(semCoins>0) coinTotal+=semCoins;
+    const mesObj  = calcMesPct(m.key);
+    const mesBonus= mesObj && mesObj.pct>=100 ? 3 : 0;
+    if(mesBonus>0) coinTotal+=mesBonus;
+    const rankCoins= rankIdx===0?3:rankIdx===1?2:rankIdx===2?1:0;
+    if(prodPct>=100) coinTotal += rankCoins;
+
+    const breakParts=[];
+    if(semCoins>0) breakParts.push('sem: '+semCoins);
+    if(mesBonus>0) breakParts.push('+3 mensal');
+    if(rankCoins>0 && prodPct>=100) breakParts.push('+'+rankCoins+' rank');
+    else if(rankCoins>0) breakParts.push('🔒rank (coef<100%)');
+
+    // tasks mini
+    const taskHtml = d.tasks.length>0
+      ? d.tasks.slice(0,4).map(t=>`<div class="t-row"><span>${t.done?'✅':'⬜'}</span><span class="t-n">${t.name}</span>${t.rawPts>0?`<span class="t-p">${t.rawPts}p</span>`:''}</div>`).join('')
+        + (d.tasks.length>4?`<div class="t-row" style="font-style:italic">+${d.tasks.length-4} tasks</div>`:'')
+      : `<div class="t-row" style="font-style:italic">aguardando ClickUp…</div>`;
+
+    return `<div class="p-card${isGlow?' glow':''}">
+      ${medal?`<div class="medal-badge">${medal}</div>`:''}
+      <div class="c-head">
+        <div style="width:36px;height:36px;border-radius:50%;background:${m.color}22;border:2px solid ${m.color}44;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:${m.color};flex-shrink:0">${m.nome[0]}</div>
+        <div><div class="c-name">${m.nome}</div><div class="c-cargo">${m.cargo}</div></div>
+        <div class="sdot ${m.id?'on':'off'}" style="margin-left:auto"></div>
+      </div>
+
+      <div class="ring-row">
+        <div class="ring-wrap">
+          ${makeRing(prodPct, prodColor)}
+          <div class="ring-center">
+            <div class="ring-pct" style="color:${prodColor}">${prodPct.toFixed(0)}%</div>
+            <div class="ring-lbl">hoje</div>
+          </div>
+        </div>
+        <div class="daily-info">
+          <div class="di-label">Produtividade</div>
+          <div class="di-pts">${isPts?d.ptsHoje:d.tasksDone+'/'+d.tasksTotal}</div>
+          <div class="di-meta">${isPts?'de '+DAILY_TARGET[m.key]+' pts hoje':'tasks concluídas'}</div>
+          <div class="di-falta ${daily_falta}">${daily_faltalabel}</div>
+        </div>
+      </div>
+
+      <div class="bars">${weekHtml}</div>
+
+      <div class="tasks-mini">${taskHtml}</div>
+
+      <div class="coin-box">
+        <div class="cb-left">
+          <div class="cb-lbl">Coins potenciais hoje</div>
+          <div class="cb-val">${coinTotal} 🪙</div>
+          ${breakParts.length>0?`<div class="cb-break">${breakParts.join(' · ')}</div>`:''}
+        </div>
+        <div class="cb-right" style="font-size:13px;color:var(--muted)">
+          ⏱ ${d.horasHoje>0.01?Math.floor(d.horasHoje)+'h'+Math.round((d.horasHoje%1)*60)+'m':'—'}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER: PRODUTIVIDADE ─────────────────────────────────────────────
+function renderProd() {
+  const ranked = [...TEAM].map(m=>({nome:m.nome,key:m.key,pct:calcProdDia(m.key)})).sort((a,b)=>b.pct-a.pct);
+  const maxV = Math.max(...ranked.map(r=>r.pct),1);
+  const coins = [3,2,1];
+  const fills = ['p1','p2','p3','pn','pn','pn','pn'];
+  document.getElementById('rank-prod').innerHTML = ranked.map((r,i)=>{
+    const w = (r.pct/Math.max(maxV,1))*100;
+    const cn = coins[i]??0;
+    const earns = r.pct>=100&&cn>0;
+    return `<div class="rk-row">
+      <div class="rk-pos">${['🥇','🥈','🥉'][i]||i+1}</div>
+      <div class="rk-name">${r.nome}</div>
+      <div class="rk-track"><div class="rk-fill ${fills[i]}" style="width:${Math.max(w,5)}%">${r.pct.toFixed(1)}%</div></div>
+      <div class="rk-coin ${earns?'':'dim'}">${earns?'+'+cn+'🪙':cn>0?'🔒'+cn:''}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER: META SEMANAL ──────────────────────────────────────────────
+function renderSem() {
+  document.getElementById('rank-sem').innerHTML = TEAM.map(m=>{
+    if(m.grupo==='pontos'){
+      const s=calcSemPct(m.key), c=calcSemCoins(m.key);
+      const hit=s.pct>=100, over=s.pct>120;
+      return `<div class="gl-row">
+        <div class="gl-name">${m.nome}</div>
+        <div class="gl-mid">
+          <div class="gl-top">
+            <span class="gl-pct" style="color:${perfColor(s.pct)}">${s.pct.toFixed(0)}%</span>
+            <span class="gl-need">${hit?'':'faltam '+s.falta+'pts'}</span>
+          </div>
+          <div class="gl-track"><div class="gl-fill" style="${bfillStyle(s.pct)};width:${clamp(s.pct)}%"></div></div>
+        </div>
+        <div class="gl-badge ${hit?(over?'over':'hit'):'no'}">${hit?(over?'🔥 '+c+'c':'✓ '+c+'c'):'—'}</div>
+      </div>`;
+    } else if(m.key==='malu'){
+      const rp=SEM_ATUAL_BASE.malu?.rotinaPct||0, hit=rp>=100;
+      return `<div class="gl-row">
+        <div class="gl-name">Malu</div>
+        <div class="gl-mid">
+          <div class="gl-top"><span class="gl-pct" style="color:${perfColor(rp)}">${rp}% rotina</span></div>
+          <div class="gl-track"><div class="gl-fill" style="${bfillStyle(rp)};width:${clamp(rp)}%"></div></div>
+        </div>
+        <div class="gl-badge ${hit?'hit':'no'}">${hit?'✓ 3c':'—'}</div>
+      </div>`;
+    } else if(m.key==='gustavo'){
+      const gp=SEM_ATUAL_BASE.gustavo?.rotinaPct||0, gHit=gp>=100;
+      return `<div class="gl-row">
+        <div class="gl-name">Gustavo</div>
+        <div class="gl-mid">
+          <div class="gl-top"><span class="gl-pct" style="color:${perfColor(gp)}">${gp}% rotina</span></div>
+          <div class="gl-track"><div class="gl-fill" style="${bfillStyle(gp)};width:${clamp(gp)}%"></div></div>
+        </div>
+        <div class="gl-badge ${gHit?'hit':'no'}">${gHit?'✓ 3c':'—'}</div>
+      </div>`;
+    } else {
+      const z=SEM_ATUAL_BASE.zion||{}, ugcHit=(z.ugcPct||0)>=100;
+      return `<div class="gl-row">
+        <div class="gl-name">Zion</div>
+        <div class="gl-mid">
+          <div class="gl-top"><span class="gl-pct" style="color:${perfColor(z.ugcPct||0)}">UGC ${z.ugcPct||0}%</span></div>
+          <div class="gl-track"><div class="gl-fill" style="${bfillStyle(z.ugcPct||0)};width:${clamp(z.ugcPct||0)}%"></div></div>
+        </div>
+        <div class="gl-badge ${ugcHit?'hit':'no'}">${ugcHit?'✓ 2c':'—'}</div>
+      </div>`;
+    }
+  }).join('');
+}
+
+// ── RENDER: META MENSAL ───────────────────────────────────────────────
+function renderMes() {
+  document.getElementById('rank-mes').innerHTML = ['samuel','thiago','klenio','bia'].map(key=>{
+    const nome=TEAM.find(m=>m.key===key).nome;
+    const r=calcMesPct(key), hit=r.pct>=100;
+    return `<div class="gl-row">
+      <div class="gl-name">${nome}</div>
+      <div class="gl-mid">
+        <div class="gl-top">
+          <span class="gl-pct" style="color:${perfColor(r.pct)}">${r.pct.toFixed(0)}%</span>
+          <span class="gl-need">${hit?'':r.falta+'pts p/ meta'}</span>
+        </div>
+        <div class="gl-track"><div class="gl-fill" style="${bfillStyle(r.pct)};width:${clamp(r.pct)}%"></div></div>
+      </div>
+      <div class="gl-badge ${hit?(r.pct>100?'over':'hit'):'no'}">${hit?(r.pct>100?'🔥 +3c':'✓ +3c'):'—'}</div>
+    </div>`;
+  }).join('')
+  + `<div style="margin-top:8px;font-size:10px;color:var(--muted)">Malu, Zion e Gustavo: meta mensal via rotina (ver SB Coins)</div>`;
+}
+
+// ── RENDER: COINS ─────────────────────────────────────────────────────
+function renderCoins() {
+  const ranked=TEAM.map(m=>({key:m.key,pct:calcProdDia(m.key)})).sort((a,b)=>b.pct-a.pct);
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('coins-row').innerHTML = TEAM.map(m=>{
+    const ri=ranked.findIndex(r=>r.key===m.key);
+    const pctR=ranked[ri].pct;
+    const base = COINS_ANTERIORES[m.key]||0;
+    const semC = calcSemCoins(m.key)||0;
+    const mesB = (calcMesPct(m.key)?.pct||0)>=100?3:0;
+    const rankC= pctR>=100 ? (ri===0?3:ri===1?2:ri===2?1:0) : 0;
+    const pot  = base+semC+mesB+rankC;
+    const isTop= pot===Math.max(...TEAM.map(m2=>{ const ri2=ranked.findIndex(r=>r.key===m2.key); const p2=ranked[ri2].pct; const rc2=p2>=100?(ri2===0?3:ri2===1?2:ri2===2?1:0):0; return (COINS_ANTERIORES[m2.key]||0)+(calcSemCoins(m2.key)||0)+((calcMesPct(m2.key)?.pct||0)>=100?3:0)+rc2; }));
+
+    const isPts = m.grupo==='pontos';
+    const md  = mesData[m.key]||{tasksDone:0,pts:0};
+    const rot = ROTINA_DATA[m.key];
+    const jun = JUNHO_DATA[m.key];
+
+    // tasks / rotina
+    let statsHtml='';
+    if(isPts){
+      const mPts=(PTS_MES_ANTES_HOJE[m.key]||0)+live[m.key].ptsHoje;
+      statsHtml=`<div class="ct-stat"><span class="ct-sl">${mPts} pts</span><span class="ct-sr">${md.tasksDone} tasks</span></div>`;
+    } else {
+      const tHoje = rot?.today?.pct!=null?`<span style="color:${perfColor(rot.today.pct)}">${rot.today.pct}%</span>`:'—';
+      const tMes  = rot?.month?.pct!=null?`<span style="color:${perfColor(rot.month.pct)}">${rot.month.pct}%</span>`:'—';
+      statsHtml=`<div class="ct-stat"><span class="ct-sl">${md.tasksDone} tasks</span></div>
+        <div class="ct-stat"><span class="ct-sl">hoje: ${tHoje}</span><span class="ct-sr">jun: ${tMes}</span></div>`;
+    }
+
+    // semanas de junho — grid S1 S2 S3 S4
+    let junHtml='';
+    if(jun){
+      const wkGrid = jun.weeks.map((w,i)=>
+        `<div class="ct-wk ${w.coinsEarned>0?'hit':'miss'}">
+          <div class="ct-wk-lbl">S${i+1}</div>
+          <div class="ct-wk-val">${w.coinsEarned>0?w.coinsEarned+'c':'—'}</div>
+        </div>`).join('');
+      junHtml=`<div class="ct-jun">
+        <span class="ct-jun-lbl">Jun 🪙</span>
+        <span class="ct-jun-val">${jun.weeklyCoinsJun}</span>
+      </div>
+      ${jun.weeks.length?`<div class="ct-wk-grid">${wkGrid}</div>`:''}`;
+    }
+
+    // rank do dia turbo
+    const medal = medals[ri]||'';
+    let rankHtml='';
+    if(pctR>=100 && rankC>0){
+      rankHtml=`<div class="ct-rank hit">${medal} +${rankC}c turbo</div>`;
+    } else if(ri<3 && rankC===0){
+      rankHtml=`<div class="ct-rank lock">🔒 ${medal} coef &lt; 100%</div>`;
+    } else {
+      rankHtml=`<div class="ct-rank dim">${ri+1}º — sem rank coin</div>`;
+    }
+
+    return `<div class="coin-tile ${isTop?'top':''}">
+      <div class="ct-name">${m.nome}</div>
+      <div class="ct-stars">${stars(base)}</div>
+      <div class="ct-total">${base}<span class="ct-plus"> +${semC+mesB+rankC}?</span></div>
+      <div class="ct-sub">pot: +${semC+mesB+rankC}</div>
+      ${statsHtml}
+      ${junHtml}
+      ${rankHtml}
+    </div>`;
+  }).join('');
+}
+
+// ── ORCHESTRATORS ─────────────────────────────────────────────────────
+function renderDynamic(){ renderCards(); renderProd(); renderSem(); renderMes(); renderCoins(); }
+function renderInit(){
+  document.getElementById('ev-name').textContent = EVENTO_NOME;
+  document.getElementById('ev-date').textContent = _evDay.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.title = EVENTO_NOME;
+  // config warning
+  if(Object.values(PTS_MES_ANTES_HOJE).every(v=>v===0)&&Object.values(COINS_ANTERIORES).every(v=>v===0))
+    document.getElementById('cfg-warn').style.display='block';
+  renderDynamic();
+}
+
+// ── MKT HUB ──────────────────────────────────────────────────────────
+function _matchTeam(email) {
+  const e = (email || '').toLowerCase();
+  return TEAM.find(t => t.email.toLowerCase() === e || (t.mktEmail && t.mktEmail.toLowerCase() === e));
+}
+async function loadCoinsFromMktHub() {
+  try {
+    const r = await fetch(`${MKTHUB_API}/api/coins?action=team-coins&key=${MKTHUB_KEY}`);
+    if (!r.ok) return;
+    const data = await r.json();
+    data.users.forEach(u => {
+      const m = _matchTeam(u.email);
+      if (m) COINS_ANTERIORES[m.key] = Number(u.totalCoins) || 0;
+    });
+    console.log('[MKT Hub] Coins:', JSON.stringify(COINS_ANTERIORES));
+  } catch(e) { console.warn('[MKT Hub] loadCoins falhou:', e); }
+}
+async function loadRotinaFromMktHub() {
+  try {
+    const r = await fetch(`${MKTHUB_API}/api/routines?action=team-rotina-summary&key=${MKTHUB_KEY}`);
+    if (!r.ok) return;
+    const data = await r.json();
+    (data.users || []).forEach(u => {
+      const m = _matchTeam(u.email);
+      if (m) ROTINA_DATA[m.key] = { today: u.today, month: u.month };
+    });
+    console.log('[MKT Hub] Rotina:', JSON.stringify(ROTINA_DATA));
+  } catch(e) { console.warn('[MKT Hub] loadRotina falhou:', e); }
+}
+async function fetchMonthForMember(m) {
+  if (!m.id) return;
+  try {
+    const evMonth = EVENTO_DATA.slice(0, 7);
+    const [y, mo] = evMonth.split('-').map(Number);
+    const monthStart = new Date(y, mo - 1, 1).getTime();
+    const monthEnd   = new Date(y, mo, 0, 23, 59, 59, 999).getTime();
+    const p = new URLSearchParams([
+      ['assignees[]', m.id], ['due_date_gt', monthStart], ['due_date_lt', monthEnd],
+      ['include_closed', 'true'], ['page', '0']
+    ]);
+    const tasks = (await apiGet('/list/' + LIST_ID + '/task?' + p)).tasks || [];
+    const done = tasks.filter(t => isComplete(t));
+    mesData[m.key] = { tasksDone: done.length, pts: done.reduce((s, t) => s + getTaskPts(t), 0) };
+  } catch(e) { console.warn('[mesData]', m.key, e); }
+}
+async function fetchMonthData() {
+  await Promise.all(TEAM.map(m => fetchMonthForMember(m)));
+  renderCoins();
+}
+async function loadJunhoBreakdown() {
+  try {
+    const r = await fetch(`${MKTHUB_API}/api/coins?action=team-junho-breakdown&key=${MKTHUB_KEY}`);
+    if (!r.ok) return;
+    const data = await r.json();
+    (data.users || []).forEach(u => {
+      const m = _matchTeam(u.email);
+      if (m) JUNHO_DATA[m.key] = {
+        ledgerTotal:    u.ledgerTotal,
+        weeklyCoinsJun: u.weeklyCoinsJun,
+        weeks:          u.weeks || [],
+      };
+    });
+    console.log('[MKT Hub] Junho:', JSON.stringify(JUNHO_DATA));
+    renderCoins();
+  } catch(e) { console.warn('[MKT Hub] loadJunho falhou:', e); }
+}
+
+// ── MAIN ─────────────────────────────────────────────────────────────
+async function startDashboard() {
+  renderInit(); startClock();
+  await Promise.all([resolveMembers(), resolveField(), loadCoinsFromMktHub(), loadRotinaFromMktHub()]);
+  await doPoll();
+  fetchMonthData();   // async — re-renderiza coins ao completar
+  loadJunhoBreakdown(); // async — re-renderiza coins ao completar
+  pollInterval = setInterval(doPoll,60000);
+}
+
+async function init() {
+  const now = new Date();
+  const isPreview = location.search.includes('preview') || location.hash==='#preview';
+  if (!isPreview && tryRestoreFrozen()) {
+    document.getElementById('main').style.display='block';
+    document.getElementById('live-pill').style.display='none';
+    renderInit(); startClock(); return;
+  }
+  if (!isPreview && now>=FREEZE_AT) {
+    document.getElementById('main').style.display='block';
+    document.getElementById('live-pill').innerHTML='<span style="color:var(--muted);font-size:12px">Evento encerrado</span>';
+    renderInit(); showFrozenBar(); return;
+  }
+  if (!isPreview && now<EV_START) { showPreEvent(); return; }
+  document.getElementById('main').style.display='block';
+  startDashboard();
+}
+
+init();
+</script>
+</body>
+</html>
+
