@@ -190,14 +190,15 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
   <div class="pre-clock" id="pre-clock">--:--:--</div>
   <div class="pre-lbl">faltam para o início</div>
   <div class="pre-info" id="pre-info"></div>
-  <button onclick="document.getElementById('pre-event').style.display='none';document.getElementById('main').style.display='block';startDashboard();" style="margin-top:32px;background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.3);color:#FFD700;font-size:13px;font-weight:700;padding:10px 24px;border-radius:20px;cursor:pointer;letter-spacing:.5px">
-    👁 Visualizar painel agora
+  <button onclick="document.getElementById('pre-event').style.display='none';document.getElementById('main').style.display='block';startDashboard();" style="margin-top:32px;background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.3);color:#FFD700;font-size:13px;font-weight:700;padding:10px 24px;border-radius:20px;cursor:pointer;letter-spacing:.5px;display:inline-flex;align-items:center;gap:7px">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    Visualizar painel agora
   </button>
 </div>
 
 <!-- FROZEN BAR -->
 <div class="frozen-bar" id="frozen-bar" style="display:none">
-  <span style="font-size:18px">🔒</span>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold);flex-shrink:0"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
   <div>
     <div style="font-size:14px;font-weight:700;color:var(--gold)">Resultado final: painel encerrado</div>
     <div style="font-size:11px;color:var(--muted)" id="frozen-sub">Dados salvos à meia-noite</div>
@@ -208,7 +209,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 <div id="main" style="display:none">
 
 <div class="cfg-warn" id="cfg-warn" style="display:none">
-  ⚠️ Preencha <b>PTS_MES_ANTES_HOJE</b>, <b>SEM_ATUAL_BASE</b> e <b>COINS_ANTERIORES</b> no código antes do evento.
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" x2="12" y1="9" y2="13"/></svg>
+  Preencha <b>PTS_MES_ANTES_HOJE</b>, <b>SEM_ATUAL_BASE</b> e <b>COINS_ANTERIORES</b> no código antes do evento.
 </div>
 
 <!-- HEADER -->
@@ -228,26 +230,26 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 
 <!-- EQUIPE -->
 <div class="block">
-  <div class="section-title">👥 Performance do Time</div>
+  <div class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Performance do Time</div>
   <div class="cards-grid" id="cards"></div>
 </div>
 
 <!-- COMPETIÇÕES -->
 <div class="block">
-  <div class="section-title">🏆 Competições do Dia</div>
+  <div class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17 14.5 22 9.5 22 9.5 17"/><path d="M20 2H4v7c0 5 3.5 7.72 7.37 7.97L12 17"/><path d="M4 2c-.55 3.84 1.5 6 2.5 6.5"/><path d="M20 2c.55 3.84-1.5 6-2.5 6.5"/><line x1="6" x2="18" y1="22" y2="22"/></svg> Competições do Dia</div>
   <div class="comp-grid">
     <div class="comp-card">
-      <div class="comp-h">⚡ Produtividade do Dia <span class="comp-rule">🥇+3 · 🥈+2 · 🥉+1 coin</span></div>
+      <div class="comp-h"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Produtividade do Dia <span class="comp-rule">1°+3 · 2°+2 · 3°+1 coin</span></div>
       <div class="comp-sub">Ranking por produtividade do dia (30/jun) · top 3 ganham coins por posição, sem restrição de coef</div>
       <div id="rank-prod"></div>
     </div>
     <div class="comp-card">
-      <div class="comp-h">📅 Meta Semanal <span class="comp-rule">3c ≥100% · 5c ≥120%</span></div>
+      <div class="comp-h"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> Meta Semanal <span class="comp-rule">3c ≥100% · 5c ≥120%</span></div>
       <div class="comp-sub">Sem 5 (29/jun+) · pontos: 3c ≥100% · 5c ≥120% · rotina: 1c ≥60% · 2c ≥80% · 3c ≥100%</div>
       <div id="rank-sem"></div>
     </div>
     <div class="comp-card">
-      <div class="comp-h">🗓️ Meta Mensal <span class="comp-rule">+3 coins extra</span></div>
+      <div class="comp-h"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg> Meta Mensal <span class="comp-rule">+3 coins extra</span></div>
       <div class="comp-sub">Bater a meta do mês rende +3 coins além dos semanais</div>
       <div id="rank-mes"></div>
     </div>
@@ -256,7 +258,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 
 <!-- SB COINS -->
 <div class="block">
-  <div class="section-title">🪙 SB Coins — Total do Mês</div>
+  <div class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><line x1="16.71" x2="16.71" y1="13.78" y2="13.71"/></svg> SB Coins — Total do Mês</div>
   <div class="coins-panel">
     <div class="coins-row" id="coins-row"></div>
   </div>
@@ -269,7 +271,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 // ⚠️  PREENCHER ANTES DO EVENTO
 // ═══════════════════════════════════════════════════════════════════
 
-const EVENTO_NOME = 'Dia de Turbo — 30 Jun';
+const EVENTO_NOME = 'Dia de Turbo';
 const EVENTO_DATA = '2026-06-30';
 
 // Meta de pontos DIÁRIA para o coeficiente de produtividade
@@ -403,10 +405,40 @@ TEAM.forEach(m => { mesData[m.key] = { tasksDone:0, pts:0 }; });
 const apiGet = p => fetch(API_BASE+p, { headers:HDR }).then(r=>r.json());
 const pad    = v => String(v).padStart(2,'0');
 const clamp  = (v,mx=100) => Math.min(mx, Math.max(0, v));
+
+// ── INLINE SVG ICONS ─────────────────────────────────────────────────
+const _ICO = {
+  users:    `<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`,
+  trophy:   `<polyline points="14.5 17 14.5 22 9.5 22 9.5 17"/><path d="M20 2H4v7c0 5 3.5 7.72 7.37 7.97L12 17"/><path d="M4 2c-.55 3.84 1.5 6 2.5 6.5"/><path d="M20 2c.55 3.84-1.5 6-2.5 6.5"/><line x1="6" x2="18" y1="22" y2="22"/>`,
+  zap:      `<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>`,
+  calendar: `<rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>`,
+  calcheck: `<rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/>`,
+  coin:     `<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><line x1="16.71" x2="16.71" y1="13.78" y2="13.71"/>`,
+  star:     `<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" stroke="none"/>`,
+  eye:      `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`,
+  lock:     `<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>`,
+  alert:    `<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" x2="12" y1="9" y2="13"/>`,
+  flame:    `<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/>`,
+  check:    `<polyline points="20 6 9 17 4 12"/>`,
+  circle:   `<circle cx="12" cy="12" r="9"/>`,
+  clock:    `<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>`,
+};
+function ico(name, size=14, color='') {
+  const p = _ICO[name] || '';
+  const cs = color ? `color:${color};` : '';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="${cs}display:inline-block;vertical-align:middle;flex-shrink:0">${p}</svg>`;
+}
+const RANK_LABEL = [
+  `<span style="color:#FFD700;font-weight:900;font-size:15px">1°</span>`,
+  `<span style="color:#94a3b8;font-weight:900;font-size:15px">2°</span>`,
+  `<span style="color:#c2956a;font-weight:900;font-size:15px">3°</span>`,
+];
+
 const stars  = n => {
   if(n<=0) return '';
-  if(n<=6) return '⭐'.repeat(n);
-  return '⭐'.repeat(5)+'<span class="ct-stars-extra">+'+( n-5)+'</span>';
+  const s = ico('star', 12, '#FFD700');
+  if(n<=6) return s.repeat(n);
+  return s.repeat(5)+'<span class="ct-stars-extra">+'+(n-5)+'</span>';
 };
 
 const STATUS_EX = ['pendente','em andamento','em progresso','in progress','alteraç','alterac','revisão','revisao','aberto','open','to do','todo'];
@@ -613,7 +645,11 @@ async function doPoll() {
 function renderCards() {
   // Compute daily prod rank for medal overlay
   const ranked = [...TEAM].map(m=>({key:m.key,pct:calcProdDia(m.key)})).sort((a,b)=>b.pct-a.pct);
-  const medals = ['🥇','🥈','🥉'];
+  const medals = [
+    `<span style="color:#FFD700;font-weight:900;font-size:18px;line-height:1">1°</span>`,
+    `<span style="color:#94a3b8;font-weight:900;font-size:18px;line-height:1">2°</span>`,
+    `<span style="color:#c2956a;font-weight:900;font-size:18px;line-height:1">3°</span>`,
+  ];
 
   document.getElementById('cards').innerHTML = TEAM.map(m=>{
     const d    = live[m.key];
@@ -661,7 +697,7 @@ function renderCards() {
           <span class="bar-lbl">Meta Mensal</span>
           <div class="bar-right">
             <span class="bar-pct" style="color:${perfColor(mes.pct)}">${mes.pct.toFixed(0)}%</span>
-            <span class="tag ${mhit?mes.pct>100?'over':'hit':'go'}">${mhit?(mes.pct>100?'🔥 superada!':'✓ batida'):'faltam '+mes.falta+'pts'}</span>
+            <span class="tag ${mhit?mes.pct>100?'over':'hit':'go'}">${mhit?(mes.pct>100?ico('flame',10)+'superada!':ico('check',10)+' batida'):'faltam '+mes.falta+'pts'}</span>
           </div>
         </div>
         <div class="btrack"><div class="bfill" style="${bfillStyle(mes.pct)};width:${clamp(mes.pct)}%"></div></div>
@@ -708,7 +744,7 @@ function renderCards() {
 
     // tasks mini
     const taskHtml = d.tasks.length>0
-      ? d.tasks.slice(0,4).map(t=>`<div class="t-row"><span>${t.done?'✅':'⬜'}</span><span class="t-n">${t.name}</span>${t.rawPts>0?`<span class="t-p">${t.rawPts}p</span>`:''}</div>`).join('')
+      ? d.tasks.slice(0,4).map(t=>`<div class="t-row"><span style="flex-shrink:0">${t.done?ico('check',11,'var(--green)'):ico('circle',11,'var(--muted)')}</span><span class="t-n">${t.name}</span>${t.rawPts>0?`<span class="t-p">${t.rawPts}p</span>`:''}</div>`).join('')
         + (d.tasks.length>4?`<div class="t-row" style="font-style:italic">+${d.tasks.length-4} tasks</div>`:'')
       : `<div class="t-row" style="font-style:italic">aguardando ClickUp…</div>`;
 
@@ -743,11 +779,11 @@ function renderCards() {
       <div class="coin-box">
         <div class="cb-left">
           <div class="cb-lbl">Coins potenciais hoje</div>
-          <div class="cb-val">${coinTotal} 🪙</div>
+          <div class="cb-val">${coinTotal} ${ico('coin',16,'var(--gold)')}</div>
           ${breakParts.length>0?`<div class="cb-break">${breakParts.join(' · ')}</div>`:''}
         </div>
         <div class="cb-right" style="font-size:13px;color:var(--muted)">
-          ⏱ ${d.horasHoje>0.01?Math.floor(d.horasHoje)+'h'+Math.round((d.horasHoje%1)*60)+'m':'—'}
+          ${ico('clock',13)} ${d.horasHoje>0.01?Math.floor(d.horasHoje)+'h'+Math.round((d.horasHoje%1)*60)+'m':'—'}
         </div>
       </div>
     </div>`;
@@ -759,9 +795,10 @@ function renderProd() {
   const todayStr = new Date().toISOString().slice(0,10);
   if (todayStr < EVENTO_DATA) {
     document.getElementById('rank-prod').innerHTML =
-      `<div style="text-align:center;padding:28px 8px;color:var(--muted);font-size:12px;line-height:1.6">
-        🔒 Ranking ativa às 8h do dia 30/jun<br>
-        <span style="font-size:10px;opacity:.6">Produtividade do Dia de Turbo</span>
+      `<div style="text-align:center;padding:28px 8px;color:var(--muted);font-size:12px;line-height:1.8;display:flex;flex-direction:column;align-items:center;gap:6px">
+        ${ico('lock',18,'var(--muted)')}
+        <span>Ranking ativa às 8h do dia 30/jun</span>
+        <span style="font-size:10px;opacity:.5">Produtividade do Dia de Turbo</span>
       </div>`;
     return;
   }
@@ -774,10 +811,10 @@ function renderProd() {
     const cn = coins[i]??0;
     const earns = cn>0;
     return `<div class="rk-row">
-      <div class="rk-pos">${['🥇','🥈','🥉'][i]||i+1}</div>
+      <div class="rk-pos">${RANK_LABEL[i]||i+1}</div>
       <div class="rk-name">${r.nome}</div>
       <div class="rk-track"><div class="rk-fill ${fills[i]}" style="width:${Math.max(w,5)}%">${r.pct.toFixed(1)}%</div></div>
-      <div class="rk-coin ${earns?'':'dim'}">${earns?'+'+cn+'🪙':''}</div>
+      <div class="rk-coin ${earns?'':'dim'}">${earns?'+'+cn+' '+ico('coin',12,'var(--gold)'):''}</div>
     </div>`;
   }).join('');
 }
@@ -797,7 +834,7 @@ function renderSem() {
           </div>
           <div class="gl-track"><div class="gl-fill" style="${bfillStyle(s.pct)};width:${clamp(s.pct)}%"></div></div>
         </div>
-        <div class="gl-badge ${hit?(over?'over':'hit'):'no'}">${hit?(over?'🔥 '+c+'c':'✓ '+c+'c'):'—'}</div>
+        <div class="gl-badge ${hit?(over?'over':'hit'):'no'}">${hit?(over?ico('flame',10)+c+'c':ico('check',10)+c+'c'):'—'}</div>
       </div>`;
     } else if(m.key==='malu'){
       const rp=ROTINA_DATA.malu?.today?.pct??SEM_ATUAL_BASE.malu?.rotinaPct??0;
@@ -808,7 +845,7 @@ function renderSem() {
           <div class="gl-top"><span class="gl-pct" style="color:${perfColor(rp)}">${rp}% rotina</span></div>
           <div class="gl-track"><div class="gl-fill" style="${bfillStyle(rp)};width:${clamp(rp)}%"></div></div>
         </div>
-        <div class="gl-badge ${mc>0?'hit':'no'}">${mc>0?'✓ '+mc+'c':'—'}</div>
+        <div class="gl-badge ${mc>0?'hit':'no'}">${mc>0?ico('check',10)+mc+'c':'—'}</div>
       </div>`;
     } else if(m.key==='gustavo'){
       const gp=ROTINA_DATA.gustavo?.today?.pct??SEM_ATUAL_BASE.gustavo?.rotinaPct??0;
@@ -819,7 +856,7 @@ function renderSem() {
           <div class="gl-top"><span class="gl-pct" style="color:${perfColor(gp)}">${gp}% rotina</span></div>
           <div class="gl-track"><div class="gl-fill" style="${bfillStyle(gp)};width:${clamp(gp)}%"></div></div>
         </div>
-        <div class="gl-badge ${gc>0?'hit':'no'}">${gc>0?'✓ '+gc+'c':'—'}</div>
+        <div class="gl-badge ${gc>0?'hit':'no'}">${gc>0?ico('check',10)+gc+'c':'—'}</div>
       </div>`;
     } else {
       const zp=ROTINA_DATA.zion?.today?.pct??SEM_ATUAL_BASE.zion?.ugcPct??0;
@@ -830,7 +867,7 @@ function renderSem() {
           <div class="gl-top"><span class="gl-pct" style="color:${perfColor(zp)}">UGC ${zp}%</span></div>
           <div class="gl-track"><div class="gl-fill" style="${bfillStyle(zp)};width:${clamp(zp)}%"></div></div>
         </div>
-        <div class="gl-badge ${zc>0?'hit':'no'}">${zc>0?'✓ '+zc+'c':'—'}</div>
+        <div class="gl-badge ${zc>0?'hit':'no'}">${zc>0?ico('check',10)+zc+'c':'—'}</div>
       </div>`;
     }
   }).join('');
@@ -850,7 +887,7 @@ function renderMes() {
         </div>
         <div class="gl-track"><div class="gl-fill" style="${bfillStyle(r.pct)};width:${clamp(r.pct)}%"></div></div>
       </div>
-      <div class="gl-badge ${hit?(r.pct>100?'over':'hit'):'no'}">${hit?(r.pct>100?'🔥 +3c':'✓ +3c'):'—'}</div>
+      <div class="gl-badge ${hit?(r.pct>100?'over':'hit'):'no'}">${hit?(r.pct>100?ico('flame',10)+'+3c':ico('check',10)+'+3c'):'—'}</div>
     </div>`;
   }).join('')
   + `<div style="margin-top:8px;font-size:10px;color:var(--muted)">Malu, Zion e Gustavo: meta mensal via rotina (ver SB Coins)</div>`;
@@ -859,7 +896,11 @@ function renderMes() {
 // ── RENDER: COINS ─────────────────────────────────────────────────────
 function renderCoins() {
   const ranked=TEAM.map(m=>({key:m.key,pct:calcProdDia(m.key)})).sort((a,b)=>b.pct-a.pct);
-  const medals=['🥇','🥈','🥉'];
+  const medals=[
+    `<span style="color:#FFD700;font-weight:900">1°</span>`,
+    `<span style="color:#94a3b8;font-weight:900">2°</span>`,
+    `<span style="color:#c2956a;font-weight:900">3°</span>`,
+  ];
   document.getElementById('coins-row').innerHTML = TEAM.map(m=>{
     const ri    = ranked.findIndex(r=>r.key===m.key);
     const pctR  = ranked[ri].pct;
@@ -912,7 +953,7 @@ function renderCoins() {
         </div>`;
       }).join('');
       junHtml=`<div class="ct-jun">
-        <span class="ct-jun-lbl">Jun 🪙 conf</span>
+        <span class="ct-jun-lbl">Jun ${ico('coin',12,'var(--gold)')} conf</span>
         <span class="ct-jun-val">${wkCoins}${todayPot>0?`<span style="font-size:10px;color:rgba(255,215,0,.4)"> +${todayPot}?</span>`:''}</span>
       </div>
       ${wkGrid?`<div class="ct-wk-grid">${wkGrid}</div>`:''}
