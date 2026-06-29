@@ -841,14 +841,16 @@ function renderCoins() {
     // semanas de junho (MKT Hub) + potencial turbo hoje
     let junHtml='';
     if(jun!==undefined){
-      const wkCoins = jun?.weeklyCoinsJun||0;
-      // total junho = semanas passadas + potencial deste evento
+      const wkCoins = jun?.weeklyCoinsJunRecalc ?? jun?.weeklyCoinsJun ?? 0;
+      // total junho = semanas passadas (sem coef) + potencial deste evento
       const junTotal = wkCoins + semC + mesB + rankC;
-      const wkGrid = (jun?.weeks||[]).map((w,i)=>
-        `<div class="ct-wk ${w.coinsEarned>0?'hit':'miss'}">
+      const wkGrid = (jun?.weeks||[]).map((w,i)=>{
+        const val = w.coinsRecalc ?? w.coinsEarned;
+        return `<div class="ct-wk ${val>0?'hit':''}">
           <div class="ct-wk-lbl">S${i+1}</div>
-          <div class="ct-wk-val">${w.coinsEarned>0?w.coinsEarned+'c':'—'}</div>
-        </div>`).join('');
+          <div class="ct-wk-val">${val>0?val+'c':'—'}</div>
+        </div>`;
+      }).join('');
       const medal = medals[ri]||'';
       const rankTag = rankC>0?`<span class="ct-rank-tag">${medal}+${rankC}</span>`:'';
       junHtml=`<div class="ct-jun">
@@ -934,6 +936,48 @@ async function fetchMonthData() {
   await Promise.all(TEAM.map(m => fetchMonthForMember(m)));
   renderCoins();
 }
+function recalcJunhoSemCoef() {
+  // Coleta todas as semanas presentes em qualquer membro
+  const weeksSet = new Set();
+  TEAM.forEach(m => (JUNHO_DATA[m.key]?.weeks || []).forEach(w => weeksSet.add(w.weekStart)));
+
+  for (const weekStart of weeksSet) {
+    // Ranqueia todos por ptsEarned nessa semana
+    const entries = TEAM
+      .map(m => ({ key: m.key, pts: JUNHO_DATA[m.key]?.weeks?.find(w => w.weekStart === weekStart)?.ptsEarned || 0 }))
+      .sort((a, b) => b.pts - a.pts);
+
+    const rankPot = [3, 2, 1];
+
+    TEAM.forEach(m => {
+      const jun = JUNHO_DATA[m.key];
+      if (!jun) return;
+      const w = jun.weeks.find(w => w.weekStart === weekStart);
+      if (!w) return;
+
+      const rankIdx = entries.findIndex(e => e.key === m.key);
+      const rankC   = rankIdx >= 0 && rankIdx < 3 && w.ptsEarned > 0 ? rankPot[rankIdx] : 0;
+
+      // Meta coins a partir dos pts brutos, sem coeficiente
+      const goal = WEEKLY_GOALS[m.key];
+      let metaC = 0;
+      if (goal && w.ptsEarned > 0) {
+        if (w.ptsEarned >= goal.meta120) metaC = goal.coins120;
+        else if (w.ptsEarned >= goal.meta100) metaC = goal.coins100;
+      }
+
+      w.coinsRecalc = metaC + rankC;
+    });
+  }
+
+  // Atualiza total junho recalculado por membro
+  TEAM.forEach(m => {
+    const jun = JUNHO_DATA[m.key];
+    if (!jun) return;
+    jun.weeklyCoinsJunRecalc = jun.weeks.reduce((s, w) => s + (w.coinsRecalc ?? w.coinsEarned), 0);
+  });
+}
+
 async function loadJunhoBreakdown() {
   try {
     const r = await fetch(`${MKTHUB_API}/api/coins?action=team-junho-breakdown&key=${MKTHUB_KEY}`);
@@ -947,7 +991,8 @@ async function loadJunhoBreakdown() {
         weeks:          u.weeks || [],
       };
     });
-    console.log('[MKT Hub] Junho:', JSON.stringify(JUNHO_DATA));
+    recalcJunhoSemCoef();
+    console.log('[MKT Hub] Junho (recalc sem coef):', JSON.stringify(JUNHO_DATA));
     renderCoins();
   } catch(e) { console.warn('[MKT Hub] loadJunho falhou:', e); }
 }
